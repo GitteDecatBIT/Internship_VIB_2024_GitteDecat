@@ -4,58 +4,47 @@ output: html_document
 date: "2024-04-23"
 ---
 
-## introduction 
-
-Biocypher is a unifying framework for biomedical knowledge graphs.
-Biocypher was build to make the process of creating a biomedical knowledge graph easier, but still flexible and transparent. 
 ...
 
 
 ## ETN
 
-# 22/04/2024
+## Week 1
 
-1. Exploring code from Biocypher (adapter)
-
+#### Monday 22/04/2024
+###### Exploring code from Biocypher (adapter)
 First, I looked up some information to get more insight of what  Biocypher exactly does. After this I looked for code that could help me understand what happens when an adapter is created. This code I found on the github page linked on the biocypher website. 
 This is the link to the github page where i found the code:  https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
+###### Create TDP and ETN:
+Start working on TDP and ETN in Markdown
 
-# 23/04/2024
 
-1. Exploring code from Biocypher (adapter)
-
-I tried to understand this code and tried to run it in my virtual studio code. i came accros a few problems that i had to figure out. First of all i had to install Biocypher and create a poetry environment. In this environment i could run the script after i downloaded all the tools/packages that were needed and i did not have installed on my system yet. 
+#### Thuesday 23/04/2024
+###### Exploring code from Biocypher (adapter)
+I tried to understand this string_adapter.py code and tried to run it in my virtual studio code. i came accros a few problems that i had to figure out. First of all i had to install Biocypher and create a poetry environment. In this environment i could run the script after i downloaded all the tools/packages that were needed and did not have installed on my system yet. 
 
 **Installation:** 
 
-- Install pipx 
+- Install pipx  --> sudo dnf install pipx, pipx ensurepath
 
-sudo dnf install pipx
-pipx ensurepath
-
-- Install poetry 
-
-pipx install poetry
+- Install poetry --> pipx install poetry
 
 - Install biocypher via poetry 
+--> create a environment and add biocyher there:poetry new Biocypher_adapter, cd Biocypher_adapter, poetry add biocypher
 
-create a environment and add biocyher there:
-poetry new Biocypher_adapter
-cd Biocypher_adapter
-poetry add biocypher
+**Install packages:**
 
-Install packages: 
+- Install bioregestry --> pip install bioregistry
 
-- Install bioregestry 
+- Install pypath--> pip install pypath-omnipath
 
-pip install bioregistry
+Problem: the script did not run completely, when running it it stops after a few step and give the prompt back 
 
-- Install pypath
+#### Wednesday 24/04/2024
+###### Exploring code from Biocypher (tutorial_adapter)
+On the biocypher website you can find a tutorial on how the scripts should work. i performed this tutorial on my system and looked at different scripts that are provided there. i tried to figure out how all the scripts are connected to each other. 
+###### Creating github page
+Started to create my github page to collect all my data/information 
 
-pip install pypath-omnipath
-
-
-# 24/04/2024
-
-2. Exploring code from biocypher (adapter tutorial)
+####Thursday 25/04/2024
 
