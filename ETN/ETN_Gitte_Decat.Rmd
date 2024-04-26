@@ -1,26 +1,33 @@
 ---
 title: "ETN_Gitte_Decat"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: "2024-04-23"
 ---
 
 ...
 
 
-## ETN
+# ETN
 
-## Week 1
+## Github
+Github page where you can find all the data/info that is discussed in this ETN : https://github.com/GitteDecatBIT/Internship_VIB_2024_GitteDecat.git
+
+### Week 1
 
 #### Monday 22/04/2024
-###### Exploring code from Biocypher (adapter)
+
+##### Exploring code from Biocypher (adapter)\
 First, I looked up some information to get more insight of what  Biocypher exactly does. After this I looked for code that could help me understand what happens when an adapter is created. This code I found on the github page linked on the biocypher website. 
-This is the link to the github page where i found the code:  https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
-###### Create TDP and ETN:
-Start working on TDP and ETN in Markdown
+https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
+
+##### Create TDP and ETN:\
+Start working ETN in Markdown
 
 
 #### Thuesday 23/04/2024
-###### Exploring code from Biocypher (adapter)
+###### Exploring code from Biocypher (adapter)\
 I tried to understand this string_adapter.py code and tried to run it in my virtual studio code. i came accros a few problems that i had to figure out. First of all i had to install Biocypher and create a poetry environment. In this environment i could run the script after i downloaded all the tools/packages that were needed and did not have installed on my system yet. 
 
 **Installation:** 
@@ -41,10 +48,26 @@ I tried to understand this string_adapter.py code and tried to run it in my virt
 Problem: the script did not run completely, when running it it stops after a few step and give the prompt back 
 
 #### Wednesday 24/04/2024
-###### Exploring code from Biocypher (tutorial_adapter)
+###### Exploring code from Biocypher (tutorial_adapter)\
 On the biocypher website you can find a tutorial on how the scripts should work. i performed this tutorial on my system and looked at different scripts that are provided there. i tried to figure out how all the scripts are connected to each other. 
-###### Creating github page
+tutorial on github: Internship_VIB_2024_GitteDecat/Biocypher_tutorial/ project-template
+###### Creating a workflow (creating a adapter)\
+i started creating a workflow based on the tutorial. 
+###### Creating github page\
 Started to create my github page to collect all my data/information 
 
 ####Thursday 25/04/2024
+##### Updated ETN\
+i updated my ETN for the past days (22-23 april)
+##### Creating a workflow (creating a adpater)\
+i finished the first version of the workflow based on the tutorial 
+workflow on github: Internship_VIB_2024_GitteDecat/Workflow/
+##### Added everything to my github\ 
+Added all the files i changed to my github 
+Added new files to my github 
+
+####Friday 25/04/2024
+##### Updated ETN\
+i updated my ETN for the past days (22-23 april)
+
 
