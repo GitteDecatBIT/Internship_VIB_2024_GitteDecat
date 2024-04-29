@@ -4,3 +4,6 @@
 [submodule "Biocypher_Crossbar/CROssBARv2"]
 	path = Biocypher_Crossbar/CROssBARv2
 	url = git@github.com:HUBioDataLab/CROssBARv2.git
+[submodule "Pypath/pypath"]
+	path = Pypath/pypath
+	url = git@github.com:saezlab/pypath.git
