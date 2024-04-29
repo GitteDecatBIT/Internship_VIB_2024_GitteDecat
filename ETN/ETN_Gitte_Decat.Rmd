@@ -22,7 +22,7 @@ Github page where you can find all the data/info that is discussed in this ETN :
 First, I looked up some information to get more insight of what  Biocypher exactly does. After this I looked for code that could help me understand what happens when an adapter is created. This code I found on the github page linked on the biocypher website. 
 https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
 
-##### Create TDP and ETN:\
+##### Creating and updating ETN:\
 Start working ETN in Markdown
 
 
@@ -44,7 +44,7 @@ I tried to understand this string_adapter.py code and tried to run it in my virt
 - Install bioregestry --> pip install bioregistry
 
 - Install pypath--> pip install pypath-omnipath
-
+  
 Problem: the script did not run completely, when running it it stops after a few step and give the prompt back 
 
 #### Wednesday 24/04/2024
@@ -68,6 +68,11 @@ Added new files to my github
 
 ####Friday 25/04/2024
 ##### Updated ETN\
-i updated my ETN for the past days (22-23 april)
+i updated my ETN for the past days
+
+##### 
 
 
+problem: 
+try running crossbar --> could not import validation_class --> pypandtic and curies where not working together --> updated curies 
+could not 
