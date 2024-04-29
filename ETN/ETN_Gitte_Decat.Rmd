@@ -9,6 +9,8 @@ date: "2024-04-23"
 ...
 
 
+# 
+
 # ETN
 
 ## Github
@@ -17,7 +19,6 @@ Github page where you can find all the data/info that is discussed in this ETN :
 ### Week 1
 
 #### Monday 22/04/2024
-
 ##### Exploring code from Biocypher (adapter)\
 First, I looked up some information to get more insight of what  Biocypher exactly does. After this I looked for code that could help me understand what happens when an adapter is created. This code I found on the github page linked on the biocypher website. 
 https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
@@ -51,28 +52,46 @@ Problem: the script did not run completely, when running it it stops after a few
 ###### Exploring code from Biocypher (tutorial_adapter)\
 On the biocypher website you can find a tutorial on how the scripts should work. i performed this tutorial on my system and looked at different scripts that are provided there. i tried to figure out how all the scripts are connected to each other. 
 tutorial on github: Internship_VIB_2024_GitteDecat/Biocypher_tutorial/ project-template
+
 ###### Creating a workflow (creating a adapter)\
 i started creating a workflow based on the tutorial. 
+
 ###### Creating github page\
 Started to create my github page to collect all my data/information 
 
 ####Thursday 25/04/2024
 ##### Updated ETN\
 i updated my ETN for the past days (22-23 april)
+
 ##### Creating a workflow (creating a adpater)\
 i finished the first version of the workflow based on the tutorial 
 workflow on github: Internship_VIB_2024_GitteDecat/Workflow/
+
 ##### Added everything to my github\ 
 Added all the files i changed to my github 
 Added new files to my github 
 
 ####Friday 25/04/2024
 ##### Updated ETN\
-i updated my ETN for the past days
+iupdated my ETN for the past days
 
-##### 
+##### IRefIndex code for biocypher 
+i tried figuring out the code on how biocypher is performed and how the adapter is created, with this information i tried to create the code for the IRefIndex database
+
+##### Run biocypher on Crossbar data
+i tried running biocypher with the crossbar data. i wanted to make sure that the code worked on my virtual studio code but i came across a few problems. 
 
 
-problem: 
+Problem: 
 try running crossbar --> could not import validation_class --> pypandtic and curies where not working together --> updated curies 
 could not 
+
+### Week 2
+
+#### Monday 29/04/2024
+##### Updated ETN\
+i updated my ETN for the week before friday
+
+##### Exploration of the Biogrid code from Crossbar
+
+you already have uniprot id ?? why use mapping then 
