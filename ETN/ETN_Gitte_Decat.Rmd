@@ -93,5 +93,15 @@ could not
 i updated my ETN for the week before friday
 
 ##### Exploration of the Biogrid code from Crossbar
+I tried figuring out which columns i need to use from the IRefIndex database. I did this based on the code from the Biogrid database. 
 
-you already have uniprot id ?? why use mapping then 
+#### Thuesday 30/04/2024
+##### Updated ETN\
+i updated my ETN for the day before 
+
+#### Write TDP
+i started writing my documentation plan for the 8 weeks of the traineeship 
+
+##### Creating an adapter file for IRefIndex
+I created a script that takes the columns you need as input for the adapter file. i tried adapting the biogrid_adapter file to make it work for irefindex 
+
