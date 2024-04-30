@@ -4,47 +4,44 @@
 #
 #  This file is part of the `pypath` python module
 #
-#  Copyright
-#  2014-2022
+#  Copyright 2014-2023
 #  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University
 #
-#  Authors: Dénes Türei (turei.denes@gmail.com)
-#           Nicolàs Palacio
-#           Sebastian Lobentanzer
-#           Erva Ulusoy
-#           Olga Ivanova
-#           Ahmet Rifaioglu
+#  Authors: see the file `README.rst`
+#  Contact: Dénes Türei (turei.denes@gmail.com)
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
-#      http://www.gnu.org/licenses/gpl-3.0.html
+#      https://www.gnu.org/licenses/gpl-3.0.html
 #
-#  Website: http://pypath.omnipathdb.org/
+#  Website: https://pypath.omnipathdb.org/
 #
+
+from __future__ import annotations
 
 from future.utils import iteritems
 
+from typing import Iterable
+
 import re
-import time
-import datetime
+import json
 import collections
 import itertools
+import functools
+import urllib.parse
 
-import timeloop
+import pandas as pd
 
 import pypath.resources.urls as urls
 import pypath.share.curl as curl
-import pypath.share.common as common
-import pypath.share.session as session_mod
 import pypath.share.settings as settings
+import pypath.share.session as session_mod
+import pypath.share.common as common
+import pypath_common._constants as _const
+import pypath.utils.taxonomy as taxonomy
+from pypath.inputs.uniprot_idmapping import idtypes as idmapping_idtypes
 
 _logger = session_mod.Logger(name = 'uniprot_input')
-
-db = {}
-_cleanup_period = settings.get('mapper_cleanup_interval')
-_lifetime = 300
-_last_used = {}
-
 
 _redatasheet = re.compile(r'([A-Z\s]{2})\s*([^\n\r]+)[\n\r]+')
 
@@ -64,10 +61,13 @@ def _all_uniprots(organism = 9606, swissprot = None):
     rev = '' if swissprot is None else ' AND reviewed: %s' % swissprot
     url = urls.urls['uniprot_basic']['url']
     get = {
-        'query': 'organism:%s%s' % (str(organism), rev),
-        'format': 'tab',
-        'columns': 'id',
+        'query': 'organism_id:%s%s' % (str(organism), rev),
+        'format': 'tsv',
+        'fields': 'accession',
     }
+
+    if organism == '*':
+        get['query'] = rev.strip(' AND ')
 
     c = curl.Curl(url, get = get, silent = False, slow = True)
     data = c.result
@@ -77,62 +77,13 @@ def _all_uniprots(organism = 9606, swissprot = None):
     }
 
 
-def all_uniprots(organism = 9606, swissprot = None):
-
-    return get_db(organism = organism, swissprot = swissprot)
-
-
-def all_swissprots(organism = 9606):
-
-    return get_db(organism = organism, swissprot = True)
-
-
-def all_trembls(organism = 9606):
-
-    return get_db(organism = organism, swissprot = False)
-
-
-def init_db(organism = 9606, swissprot = None):
-
-    swissprot = _swissprot_param(swissprot)
-    _logger._log(
-        'Loading list of all UniProt IDs for '
-        'organism `%u` (only SwissProt: %s).' % (
-            organism,
-            str(swissprot),
-        )
-    )
-
-    key = (organism, swissprot)
-
-    globals()['db'][key] = _all_uniprots(
-        organism = organism,
-        swissprot = swissprot,
-    )
-    globals()['_last_used'][key] = time.time()
-
-
-def get_db(organism = 9606, swissprot = None):
-
-    swissprot = _swissprot_param(swissprot)
-    key = (organism, swissprot)
-
-    if key not in globals()['db']:
-
-        init_db(organism = organism, swissprot = swissprot)
-
-    globals()['_last_used'][key] = time.time()
-
-    return globals()['db'][key]
-
-
 def _swissprot_param(swissprot):
 
     return (
-        'yes'
-            if swissprot in {'yes', 'YES', True} else
-        'no'
-            if swissprot in {'no', 'NO', False} else
+        'true'
+            if swissprot in {'true', 'True', 'yes', 'YES', True} else
+        'false'
+            if swissprot in {'false', 'False', 'no', 'NO', False} else
         None
     )
 
@@ -144,73 +95,6 @@ def valid_uniprot(name):
     """
 
     return bool(reac.match(name))
-
-
-def is_uniprot(name, organism = 9606, swissprot = None):
-    """
-    Tells if ``name`` is a UniProt ID of ``organism``.
-    If ``swissprot`` is None then both SwissProt and TrEMBL IDs will be
-    considered.
-    """
-
-    return name in get_db(organism = organism, swissprot = swissprot)
-
-
-def is_swissprot(name, organism = 9606):
-    """
-    Tells if ``name`` is a SwissProt ID of ``organism``.
-    For TrEMBL IDs returns False.
-    """
-
-    return is_uniprot(name, organism = organism, swissprot = True)
-
-
-def is_trembl(name, organism = 9606):
-    """
-    Tells if ``name`` is a TrEMBL ID of ``organism``.
-    For SwissProt IDs returns False.
-    """
-
-    return is_uniprot(name, organism = organism, swissprot = False)
-
-
-_cleanup_timeloop = timeloop.Timeloop()
-_cleanup_timeloop.logger.setLevel(9999)
-
-@_cleanup_timeloop.job(
-    interval = datetime.timedelta(
-        seconds = _cleanup_period
-    )
-)
-def _cleanup():
-
-    keys = list(globals()['db'].keys())
-
-    for key in keys:
-
-        if time.time() - globals()['_last_used'][key] > _lifetime:
-
-            _remove(key)
-
-_cleanup_timeloop.start(block = False)
-
-
-def _remove(key):
-
-    if key in globals()['db']:
-
-        _logger._log(
-            'Removing UniProt ID list for '
-            'organism `%u` (SwissProt: %s)' % (
-                key[0],
-                str(key[1]),
-            )
-        )
-        del globals()['db'][key]
-
-    if key in globals()['_last_used']:
-
-        del globals()['_last_used'][key]
 
 
 def protein_datasheet(identifier):
@@ -455,85 +339,564 @@ def get_uniprot_sec(organism = 9606):
         NCBI Taxonomy ID of the organism.
     """
 
-    if organism is not None:
-        proteome = all_uniprots(organism=organism)
+    _organism = organism not in (None, _const.NOT_ORGANISM_SPECIFIC)
+
+    if _organism:
+
+        from pypath.inputs import uniprot_db
+        proteome = uniprot_db.all_uniprots(organism=organism)
         proteome = set(proteome)
 
     sec_pri = []
     url = urls.urls['uniprot_sec']['url']
     c = curl.Curl(url, silent = False, large = True, timeout = 2400)
 
-    for line in filter(
-        lambda line:
-            len(line) == 2 and (organism is None or line[1] in proteome),
-            map(
-                lambda i:
-                    i[1].split(),
-                filter(
-                    lambda i: i[0] >= 30,
-                    enumerate(c.result)
-                )
-            )
-        ):
+    for i, line in enumerate(c.result):
 
-        yield line
+        if i < 30:
+
+            continue
+
+        line = line.split()
+
+        if len(line) == 2 and (not _organism or line[1] in proteome):
+
+            yield line
 
 
-_uniprot_fields = {
-    'function': 'comment(FUNCTION)',
-    'activity_regulation': 'comment(ACTIVITY REGULATION)',
-    'tissue_specificity': 'comment(TISSUE SPECIFICITY)',
-    'developmental_stage': 'comment(DEVELOPMENTAL STAGE)',
-    'induction': 'comment(INDUCTION)',
-    'intramembrane': 'feature(INTRAMEMBRANE)',
-    'signal_peptide': 'feature(SIGNAL)',
-    'subcellular_location': 'comment(SUBCELLULAR LOCATION)',
-    'transmembrane': 'feature(TRANSMEMBRANE)',
-    'comment': 'comment(MISCELLANEOUS)',
-    'topological_domain': 'feature(TOPOLOGICAL DOMAIN)',
-    'family': 'families',
-    'interactor': 'interactor',
-    'keywords': 'keywords',
-}
+class UniprotQuery:
 
-
-def uniprot_data(field, organism = 9606, reviewed = True):
-    """
-    Retrieves a field from UniProt for all proteins of one organism, by
-    default only the reviewed (SwissProt) proteins.
-    For the available fields refer to the ``_uniprot_fields`` attribute of
-    this module or the UniProt website:
-    https://www.uniprot.org/help/uniprotkb_column_names
-    """
-
-    rev = (
-        ' AND reviewed: yes'
-            if reviewed == True or reviewed == 'yes' else
-        ' AND reviewed: no'
-        if reviewed == False or reviewed == 'no' else
-        ''
-    )
-    _field = _uniprot_fields[field] if field in _uniprot_fields else field
-    url = urls.urls['uniprot_basic']['url']
-    get = {
-        'query': 'organism:%s%s' % (str(organism), rev),
-        'format': 'tab',
-        'columns': 'id,%s' % _field,
-        'compress': 'yes',
+    _PROCESS = {
+        'dict': '_process_dict',
+        'list': '_process_list',
+    }
+    _OP = ('_AND', '_NOT', '_OR')
+    _OPSTART = re.compile(r'^(OR|AND)')
+    _OPEND = re.compile(r'(OR|AND)$')
+    _FIELDSEP = re.compile(r'[\s;]')
+    _FIELDEND = re.compile(r'$;')
+    _SYNONYMS = {
+        'organism': 'organism_id',
+        'ncbi_tax_id': 'organism_id',
+    }
+    _FIELD_SYNONYMS = {
+        'function': 'cc_function',
+        'activity_regulation': 'cc_activity_regulation',
+        'tissue_specificity': 'cc_tissue_specificity',
+        'developmental_stage': 'cc_developmental_stage',
+        'induction': 'cc_induction',
+        'intramembrane': 'ft_intramem',
+        'signal_peptide': 'ft_signal',
+        'subcellular_location': 'cc_subcellular_location',
+        'transmembrane': 'ft_transmem',
+        'comment': 'cc_miscellaneous',
+        'topological_domain': 'ft_topo_dom',
+        'family': 'protein_families',
+        'interactor': 'cc_interaction',
+        'keywords': 'keyword',
     }
 
-    c = curl.Curl(url, get = get, silent = False, large = True, compr = 'gz')
-    _ = next(c.result)
 
-    return dict(
-        id_value
-        for id_value in
-        (
-            line.strip('\n\r').split('\t')
-            for line in c.result if line.strip('\n\r')
+    def __init__(
+            self,
+            *query,
+            fields: str | Iterable[str] | None = None,
+            **kwargs
+        ):
+        """
+        Constructs a query for the UniProt REST API.
+
+        Args:
+            query:
+                Query elements: can be a ready query or its components, bypassing
+                the processing in this function or performing only simple
+                concatenation. Alternatively, it can be a nested structure of lists
+                and dicts describing more complex queries. See the examples below.
+            kwargs:
+                Same as passing a dict to ``query``.
+
+        Details:
+            The query can be built in several ways:
+            - Simple string or concatenation of strings:
+              query_builder('kinase AND organism_id:9606')
+              query_builder('kinase', 'organism_id:9606')
+              query_builder('kinase', organism_id = 9606)
+              The above 3 examples all return the same query:
+              `kinase AND organism_id:9606`
+            - The default operator within lists is `OR` and within dicts is `AND`:
+              query_builder(organism = [9606, 10090, 10116])
+              `organism_id:9606 OR organism_id:10090 OR organism_id:10116`
+              query_builder({'organism_id': 9606, 'reviewed': True})
+              `organism_id:9606 AND reviewed:true`
+            - These default operators can be changed by including the `op` key in
+              dicts or including the operator with an underscore in lists:
+              query_builder({'length': (500,), 'mass': (50000,), 'op': 'OR'})
+              `length:[500 TO *] OR mass:[50000 TO *]`
+              query_builder(lit_author = ['Huang', 'Kovac', '_AND'])
+              `lit_author:Huang AND lit_author:Kovac`
+            - The nested structures translate into nested parentheses in the query:
+              query_builder({'organism_id': [9606, 10090], 'reviewed': True})
+              `(organism_id:9606 OR organism_id:10090) AND reviewed:true`
+            - Values are converted to strings, intervals can be provided as tuples:
+              query_builder({'length': (100, None), 'organism_id': 9606})
+              `length:[100 TO *] AND organism_id:9606`
+
+            For a complete reference of the available parameters, see
+            https://www.uniprot.org/help/query-fields and
+            https://www.uniprot.org/help/text-search for additional syntax
+            elements.
+
+            For the available fields refer to the ``_FIELD_SYNONYMS`` attribute of
+            this class or the UniProt website:
+            https://www.uniprot.org/help/return_fields
+
+        Methods:
+            __iter__:
+                Perform the query and iterate over the lines in the results,
+                skipping the header and the empty lines, stripping the
+                linebreaks and splitting by tab.
+
+                Yields:
+                    A list of fields for each line.
+
+        Attributes:
+            fail_on_empty:
+                If set to True, an error will be raised if the UniProt API
+                returns empty response. By default no error is raised.
+            name_process:
+                If set to True, a different processing will be applied on the
+                results. This is appropriate especially for identifier type
+                fields.
+        """
+
+        self.fields = common.to_list(fields)
+        self._args = query, kwargs
+        self._process_main()
+        # tolerate empty result: Curl returns None in case of
+        # empty file but in case of UniProt, especially for under-researched
+        # taxons it can happen there is no result for certain queries
+        self.fail_on_empty = False
+        self.name_process = False
+
+
+    @classmethod
+    def _value(
+            cls,
+            val: str | int | bool | tuple,
+            field: str | None = None,
+        ) -> str:
+
+        field = cls._SYNONYMS.get(field, field)
+
+        if field == 'organism_id':
+
+            result = str(taxonomy.ensure_ncbi_tax_id(val) or val)
+
+        elif isinstance(val, tuple):
+
+            val = (tuple(map(cls._value, val)) + ('*',))[:2]
+            result = '[%s TO %s]' % val
+
+        elif val is None:
+
+            if field == 'reviewed':
+
+                result = ''
+                field = None
+
+            else:
+
+                result = '*'
+
+        elif isinstance(val, bool):
+
+            result = str(val).lower()
+
+        else:
+
+            result = str(val)
+
+        if field:
+
+            result = f'{field}:{result}'
+
+        return result
+
+
+    def _process_main(self):
+
+        query, kwargs = self._args
+        op = kwargs.pop('_op', 'AND')
+        query = list(query)
+        query.append(kwargs)
+        result = []
+
+        for q in query:
+
+            q = self._process(q).strip()
+
+            if (
+                result and
+                q and
+                not self._OPEND.match(result[-1]) and
+                not self._OPSTART.match(q)
+            ):
+
+                result.append(op)
+
+            if q:
+
+                result.append(q)
+
+        self.query = ' '.join(result)
+
+
+    @classmethod
+    def _process(
+            cls,
+            query: str | list | dict,
+            field: str | None = None,
+        ) -> str:
+
+        method = cls._PROCESS.get(type(query).__name__, '_value')
+
+        return getattr(cls, method)(query, field)
+
+
+    @classmethod
+    def _process_list(cls, query: list, field: str | None = None) -> str:
+
+        op = '_OR'
+
+        for _op in cls._OP:
+
+            if _op in query:
+
+                op = query.pop(query.index(_op))
+
+        op = f' {op[1:]} '
+
+        query = [cls._process(i, field) for i in query]
+
+        return cls._par(op.join(query))
+
+
+    @classmethod
+    def _process_dict(cls, query: dict, field: str | None = None) -> str:
+
+        query = query.copy()
+        op = ' %s ' % query.pop('op', ' AND ').strip()
+        result = op.join(
+            it for k, v in query.items()
+            if (it := cls._process(v, k))
         )
-        if id_value[1]
-    )
+
+        return cls._par(result) if len(query) > 1 else result
+
+
+    @staticmethod
+    def _par(value: str) -> str:
+
+        return f'({value})' if value else ''
+
+
+    @property
+    def _get(self) -> dict[str, str]:
+
+        field_qs = ','.join(
+            ['accession'] +
+            [self._FIELD_SYNONYMS.get(f, f) for f in self.fields]
+        )
+
+        return {
+            'query': self.query,
+            'format': 'tsv',
+            'fields': field_qs,
+            'compressed': 'true',
+        }
+
+
+    @property
+    def _baseurl(self) -> str:
+
+        return urls.urls['uniprot_basic']['url']
+
+
+    @property
+    def url(self) -> str:
+        """
+        UniProt REST API URL (urlencoded).
+
+        Returns:
+            A valid query suitable for the UniProt REST API.
+        """
+
+        return f'{self._baseurl}?{urllib.parse.urlencode(self._get)}'
+
+
+    @property
+    def url_plain(self) -> str:
+        """
+        UniProt REST API URL (plain).
+        """
+
+        return urllib.parse.unquote_plus(self.url)
+
+
+    def __iter__(self):
+
+        c = curl.Curl(
+            self._baseurl,
+            get = self._get,
+            silent = False,
+            large = True,
+            compr = 'gz',
+        )
+        result = c.result if c.result or self.fail_on_empty else [0].__iter__()
+        _ = next(result)
+        _proc0 = functools.partial(self._FIELDEND.sub, '')
+        _proc1 = self._FIELDSEP.split if self.name_process else common.identity
+
+        for line in result:
+
+            line = line.strip('\n\r')
+
+            if line.strip():
+
+                yield [_proc1(_proc0(f)) for f in line.split('\t')]
+
+
+    def perform(self) -> list[str] | dict[str, str] | dict[str, dict[str, str]]:
+        """
+        Perform the query and preprocess the result.
+
+        Returns:
+            - A list of UniProt IDs if no fields were provided.
+            - A dict of UniProt IDs and corresponding field values if
+              exactly one field was provided.
+            - A dict with field names as top level keys and dicts of the
+              kind described in the previous point as values.
+        """
+
+        _id, *variables = zip(*self)
+        _id = list(map(common.sfirst, _id))
+
+        if variables:
+
+            result = {
+                f: {i: v for i, v in zip(_id, vs) if i}
+                for f, vs in zip(self.fields, variables)
+            }
+
+            result = (
+                common.first(result.values())
+                    if len(result) == 1 else
+                result
+            )
+
+        else:
+
+            result = list(_id)
+
+        return result
+
+
+def query_builder(*query, **kwargs) -> str:
+    """
+    Build a query for the UniProt web site and REST API.
+
+    Args:
+        query:
+            Query elements: can be a ready query or its components, bypassing
+            the processing in this function or performing only simple
+            concatenation. Alternatively, it can be a nested structure of lists
+            and dicts describing more complex queries. See the examples below.
+        kwargs:
+            Same as passing a dict to ``query``.
+
+    Details:
+        The query can be built in several ways:
+        - Simple string or concatenation of strings:
+          query_builder('kinase AND organism_id:9606')
+          query_builder('kinase', 'organism_id:9606')
+          query_builder('kinase', organism_id = 9606)
+          The above 3 examples all return the same query:
+          `kinase AND organism_id:9606`
+        - The default operator within lists is `OR` and within dicts is `AND`:
+          query_builder(organism = [9606, 10090, 10116])
+          `organism_id:9606 OR organism_id:10090 OR organism_id:10116`
+          query_builder({'organism_id': 9606, 'reviewed': True})
+          `organism_id:9606 AND reviewed:true`
+        - These default operators can be changed by including the `op` key in
+          dicts or including the operator with an underscore in lists:
+          query_builder({'length': (500,), 'mass': (50000,), 'op': 'OR'})
+          `length:[500 TO *] OR mass:[50000 TO *]`
+          query_builder(lit_author = ['Huang', 'Kovac', '_AND'])
+          `lit_author:Huang AND lit_author:Kovac`
+        - The nested structures translate into nested parentheses in the query:
+          query_builder({'organism_id': [9606, 10090], 'reviewed': True})
+          `(organism_id:9606 OR organism_id:10090) AND reviewed:true`
+        - Values are converted to strings, intervals can be provided as tuples:
+          query_builder({'length': (100, None), 'organism_id': 9606})
+          `length:[100 TO *] AND organism_id:9606`
+
+        For a complete reference of the available parameters, see
+        https://www.uniprot.org/help/query-fields and
+        https://www.uniprot.org/help/text-search for additional syntax
+        elements.
+
+    Returns:
+        A query that can be inserted into the UniProt search field.
+    """
+
+    return UniprotQuery(*query, **kwargs).query
+
+
+def uniprot_data(
+        *query,
+        fields: str | Iterable[str] | None = None,
+        organism: str | int | None = 9606,
+        reviewed: bool | None = True,
+        **kwargs
+    ) -> dict[str, str] | dict[str, dict[str, str]]:
+    """
+    Basic client for the UniProt REST API.
+
+    Retrieves one or more fields from UniProt, by default for all reviewed
+    (SwissProt) proteins of one organism
+
+    Args:
+        query:
+            Query elements: can be a ready query or its components, bypassing
+            the processing in this function or performing only simple
+            concatenation. Alternatively, it can be a nested structure of lists
+            and dicts describing more complex queries. See the examples below.
+        fields:
+            One or more UniProt field name. See details.
+        organism:
+            Organism name or identifier, e.g. "human", or "Homo sapiens",
+            or 9606.
+        reviewed:
+            Restrict the query to SwissProt (True), to TrEMBL (False), or
+            cover both (None).
+        kwargs:
+            Same as passing a dict to ``query``.
+
+    Details:
+        The query can be built in several ways:
+        - Simple string or concatenation of strings:
+          query_builder('kinase AND organism_id:9606')
+          query_builder('kinase', 'organism_id:9606')
+          query_builder('kinase', organism_id = 9606)
+          The above 3 examples all return the same query:
+          `kinase AND organism_id:9606`
+        - The default operator within lists is `OR` and within dicts is `AND`:
+          query_builder(organism = [9606, 10090, 10116])
+          `organism_id:9606 OR organism_id:10090 OR organism_id:10116`
+          query_builder({'organism_id': 9606, 'reviewed': True})
+          `organism_id:9606 AND reviewed:true`
+        - These default operators can be changed by including the `op` key in
+          dicts or including the operator with an underscore in lists:
+          query_builder({'length': (500,), 'mass': (50000,), 'op': 'OR'})
+          `length:[500 TO *] OR mass:[50000 TO *]`
+          query_builder(lit_author = ['Huang', 'Kovac', '_AND'])
+          `lit_author:Huang AND lit_author:Kovac`
+        - The nested structures translate into nested parentheses in the query:
+          query_builder({'organism_id': [9606, 10090], 'reviewed': True})
+          `(organism_id:9606 OR organism_id:10090) AND reviewed:true`
+        - Values are converted to strings, intervals can be provided as tuples:
+          query_builder({'length': (100, None), 'organism_id': 9606})
+          `length:[100 TO *] AND organism_id:9606`
+
+        For a complete reference of the available parameters, see
+        https://www.uniprot.org/help/query-fields and
+        https://www.uniprot.org/help/text-search for additional syntax
+        elements.
+
+        For the available fields refer to the ``_FIELD_SYNONYMS`` attribute of
+        the UniprotQuery class or the UniProt website:
+        https://www.uniprot.org/help/return_fields
+
+    Returns:
+        - A list of UniProt IDs if no fields were provided.
+        - A dict of UniProt IDs and corresponding field values if
+          exactly one field was provided.
+        - A dict with field names as top level keys and dicts of the
+          kind described in the previous point as values.
+    """
+
+    for arg in ('organism', 'reviewed'):
+
+        if locals()[arg] is not None:
+
+            kwargs[arg] = locals()[arg]
+
+    return uniprot_query(*query, fields = fields, **kwargs)
+
+
+def uniprot_query(
+        *query,
+        fields: str | Iterable[str] | None = None,
+        **kwargs
+    ) -> dict[str, str] | dict[str, dict[str, str]]:
+    """
+    Basic client for the UniProt REST API.
+
+    Args:
+        query:
+            Query elements: can be a ready query or its components, bypassing
+            the processing in this function or performing only simple
+            concatenation. Alternatively, it can be a nested structure of lists
+            and dicts describing more complex queries. See the examples below.
+        fields:
+            One or more UniProt field name. See details.
+        kwargs:
+            Same as passing a dict to ``query``.
+
+    Details:
+        The query can be built in several ways:
+        - Simple string or concatenation of strings:
+          query_builder('kinase AND organism_id:9606')
+          query_builder('kinase', 'organism_id:9606')
+          query_builder('kinase', organism_id = 9606)
+          The above 3 examples all return the same query:
+          `kinase AND organism_id:9606`
+        - The default operator within lists is `OR` and within dicts is `AND`:
+          query_builder(organism = [9606, 10090, 10116])
+          `organism_id:9606 OR organism_id:10090 OR organism_id:10116`
+          query_builder({'organism_id': 9606, 'reviewed': True})
+          `organism_id:9606 AND reviewed:true`
+        - These default operators can be changed by including the `op` key in
+          dicts or including the operator with an underscore in lists:
+          query_builder({'length': (500,), 'mass': (50000,), 'op': 'OR'})
+          `length:[500 TO *] OR mass:[50000 TO *]`
+          query_builder(lit_author = ['Huang', 'Kovac', '_AND'])
+          `lit_author:Huang AND lit_author:Kovac`
+        - The nested structures translate into nested parentheses in the query:
+          query_builder({'organism_id': [9606, 10090], 'reviewed': True})
+          `(organism_id:9606 OR organism_id:10090) AND reviewed:true`
+        - Values are converted to strings, intervals can be provided as tuples:
+          query_builder({'length': (100, None), 'organism_id': 9606})
+          `length:[100 TO *] AND organism_id:9606`
+
+        For a complete reference of the available parameters, see
+        https://www.uniprot.org/help/query-fields and
+        https://www.uniprot.org/help/text-search for additional syntax
+        elements.
+
+        For the available fields refer to the ``_FIELD_SYNONYMS`` attribute of
+        the UniprotQuery class or the UniProt website:
+        https://www.uniprot.org/help/return_fields
+
+    Returns:
+        - A list of UniProt IDs if no fields were provided.
+        - A dict of UniProt IDs and corresponding field values if
+          exactly one field was provided.
+        - A dict with field names as top level keys and dicts of the
+          kind described in the previous point as values.
+    """
+
+    return UniprotQuery(*query, fields = fields, **kwargs).perform()
 
 
 def uniprot_preprocess(field, organism = 9606, reviewed = True):
@@ -546,7 +909,7 @@ def uniprot_preprocess(field, organism = 9606, reviewed = True):
     result = collections.defaultdict(set)
 
     data = uniprot_data(
-        field = field,
+        fields = field,
         organism = organism,
         reviewed = reviewed,
     )
@@ -630,7 +993,7 @@ def uniprot_keywords(organism = 9606, reviewed = True):
     result = collections.defaultdict(set)
 
     data = uniprot_data(
-        field = 'keywords',
+        fields = 'keywords',
         organism = organism,
         reviewed = reviewed,
     )
@@ -665,7 +1028,7 @@ def uniprot_families(organism = 9606, reviewed = True):
     result = collections.defaultdict(set)
 
     data = uniprot_data(
-        field = 'family',
+        fields = 'family',
         organism = organism,
         reviewed = reviewed,
     )
@@ -707,25 +1070,25 @@ def uniprot_topology(organism = 9606, reviewed = True):
     result = collections.defaultdict(set)
 
     transmem = uniprot_data(
-        field = 'transmembrane',
+        fields = 'transmembrane',
         organism = organism,
         reviewed = reviewed,
     )
 
     intramem = uniprot_data(
-        field = 'intramembrane',
+        fields = 'intramembrane',
         organism = organism,
         reviewed = reviewed,
     )
 
     signal = uniprot_data(
-        field = 'signal_peptide',
+        fields = 'signal_peptide',
         organism = organism,
         reviewed = reviewed,
     )
 
     data = uniprot_data(
-        field = 'topological_domain',
+        fields = 'topological_domain',
         organism = organism,
         reviewed = reviewed,
     )
@@ -1054,7 +1417,7 @@ def uniprot_tissues(organism = 9606, reviewed = True):
 
 
     data = uniprot_data(
-        'tissue_specificity',
+        fields = 'tissue_specificity',
         organism = organism,
         reviewed = reviewed,
     )
@@ -1165,10 +1528,19 @@ def uniprot_tissues(organism = 9606, reviewed = True):
     return dict(result)
 
 
-def uniprot_taxonomy():
+def uniprot_taxonomy(
+        ncbi_tax_ids: bool = False,
+    ) -> dict[str, set[str]] | dict[str, int]:
     """
-    Returns a dictionary with SwissProt IDs as keys and sets of various taxon
-    names as values.
+    From UniProt IDs to organisms
+
+    Args:
+        ncbi_tax_ids:
+            Translate the names to NCBI Taxonomy numeric identifiers.
+
+    Returns:
+        A dictionary with SwissProt IDs as keys and sets of various taxon
+        names as values.
     """
 
     rename = re.compile(r'\(?(\w[\w\s\',/\.-]+\w)\)?')
@@ -1190,6 +1562,23 @@ def uniprot_taxonomy():
             for ac in reac.findall(line):
 
                 result[ac].update(names)
+
+    if ncbi_tax_ids:
+
+        new_result = {}
+
+        for ac, names in result.items():
+
+            for name in names:
+
+                nti = taxonomy.ensure_ncbi_tax_id(name)
+
+                if nti:
+
+                    new_result[ac] = nti
+                    break
+
+        result = new_result
 
     return dict(result)
 
@@ -1227,14 +1616,14 @@ def uniprot_ncbi_taxids():
 
         line = line.split('\t')
 
-        if line[0].isdigit() and len(line) > 3:
+        if line[0].isdigit() and len(line) > 2:
 
             taxid = int(line[0])
 
             result[taxid] = Taxon(
                 ncbi_id = taxid,
                 latin = line[2],
-                english = line[3],
+                english = line[1] or None,
             )
 
     return result
