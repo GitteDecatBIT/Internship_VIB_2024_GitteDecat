@@ -12,6 +12,8 @@ from time import time
 #import sys
 #sys.path.append('/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex')  
 
+from IRefIndex_pypath_url import url as irefindex_url
+from IRefIndex_input import irefindex_interactions
 #import IRefIndex_input  # Now you can import script1
 #from pypath.inputs import biogrid, uniprot
 from pypath.inputs import uniprot
@@ -42,7 +44,8 @@ class IRefIndexEdgeFields(Enum):
 
 
 class IRefIndex:
-    url = 'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
+    url = irefindex_url.get("irefindex").get("url")
+    #'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
     c = curl.Curl(url, silent = False, large = True, slow = True)
     f = next(iter(c.result.values()))
     nul = f.readline()
@@ -54,11 +57,9 @@ class IRefIndex:
         pattern_organism= r'taxid:(\d+)'
         match_organism= re.search(pattern_organism, input_organism)
         if match_organism:
-            organism = match_organism.group(1) # Extracting the number
+            organism = match_organism.group(1) 
         else:
             organism = ""
-
-        #print(organism)
 
     def __init__(self, 
                  output_dir = None, 
@@ -74,7 +75,7 @@ class IRefIndex:
                  aggregate_pubmed_ids: bool = True,
                  aggregate_methods: bool = True):
         """
-        Downloads and processes BioGRID data
+        Downloads and processes IRefIndex data
 
             Args:
                 export_csvs: Flag for whether or not create csvs of outputs of databases
@@ -84,7 +85,7 @@ class IRefIndex:
                 debug: if True, turns on debug mode in pypath.
                 retries: number of retries in case of download error.
                 organism: taxonomy id number of selected organism, if it is None, downloads all organism data.
-                biogrid_fields: biogrid fields to be used in the graph.
+                irefindex_fields: irefindex fields to be used in the graph.
                 add_prefix: if True, add prefix to uniprot ids
                 test_mode: if True, take small sample from data for testing
                 aggregate_pubmed_ids: if True, collects all pubmed ids that belongs to same protein pair
@@ -127,14 +128,13 @@ class IRefIndex:
     
     def download_irefindex_data(self):
         """
-        Wrapper function to download BioGRID data using pypath; used to access
+        Wrapper function to download IRefIndex data using pypath; used to access
         settings.
             
-        To do: Make arguments of biogrid.biogrid_all_interactions selectable for user. 
+        To do: Make arguments of irefindex_all_interactions selectable for user. 
         """
         
-        ## check link how to do this?? 
-        logger.info(f"This is the link of IRefIndex data we downloaded:{urls.urls['irefindex']['url']}. Please check if it is up to date")    
+        logger.info(f"This is the link of IRefIndex data we downloaded:{IRefIndex.url}. Please check if it is up to date")    
         logger.debug("Started downloading IRefIndex data")
         t0 = time()
 
@@ -146,9 +146,8 @@ class IRefIndex:
             if not self.cache:
                 stack.enter_context(curl.cache_off())
 
-            # download biogrid data
-            self.biogrid_ints = IRefIndex_input.irefindex_interactions
-            (self.organism, 9999999999, False)
+            # download irefindex data
+            self.irefindex_ints = irefindex_interactions(self.organism, 9999999999, False)
                         
             # download these fields for mapping from gene symbol to uniprot id   
             ## niet nodig?? je hebt al uniprot ids????       
@@ -157,10 +156,20 @@ class IRefIndex:
             
             
         if self.test_mode:
-            self.biogrid_ints = self.biogrid_ints[:100]            
+            self.irefindex_ints = self.irefindex_ints[:100]            
                     
         t1 = time()
         logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
-    
-    export_dataframe()
-    download_irefindex_data()
+
+
+ # Instantiate the BioGRID class
+irefindex_instance = IRefIndex()
+
+# Download BioGRID data
+irefindex_instance.download_irefindex_data()
+
+# Process BioGRID data
+#irefindex_instance.irefindex_process()
+
+# Print final BioGRID interactions
+#print(irefindex_instance.final_biogrid_ints)

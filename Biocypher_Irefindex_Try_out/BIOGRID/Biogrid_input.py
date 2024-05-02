@@ -182,5 +182,9 @@ def biogrid_all_interactions(
     if htp_limit is not None:
 
         interactions = [i for i in interactions if refc[i[2]] <= htp_limit]
+        #print(interactions)
 
     return interactions
+
+    
+

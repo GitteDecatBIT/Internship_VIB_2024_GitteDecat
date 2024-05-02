@@ -1,0 +1,24 @@
+2024-05-02 14:19:31,488	INFO	module:_logger
+This is BioCypher v0.5.37.
+2024-05-02 14:19:31,488	INFO	module:_logger
+Logging into `biocypher-log/biocypher-20240502-141931.log`.
+2024-05-02 14:19:31,489	DEBUG	module:_get
+Loading module biocypher._get.
+2024-05-02 14:19:31,521	DEBUG	module:_misc
+Loading module biocypher._misc.
+2024-05-02 14:19:32,356	DEBUG	module:_core
+Loading module biocypher._core.
+2024-05-02 14:19:32,369	DEBUG	module:_write
+Loading module biocypher._write.
+2024-05-02 14:19:32,371	DEBUG	module:_create
+Loading module biocypher._create.
+2024-05-02 14:19:32,381	DEBUG	module:_connect
+Loading module biocypher._connect.
+2024-05-02 14:19:32,747	DEBUG	module:_ontology
+Loading module biocypher._ontology.
+2024-05-02 14:19:32,962	DEBUG	module:_mapping
+Loading module biocypher._mapping.
+2024-05-02 14:19:32,967	DEBUG	module:_translate
+Loading module biocypher._translate.
+2024-05-02 14:19:32,969	DEBUG	module:_deduplicate
+Loading module biocypher._deduplicate.

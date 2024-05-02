@@ -1,0 +1,130 @@
+[2024-05-02 14:08:31] Welcome!
+[2024-05-02 14:08:31] Logger started, logging into `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-2vxop.log`.
+[2024-05-02 14:08:31] Session `2vxop` started.
+[2024-05-02 14:08:31] Config has been read from the following files:
+[2024-05-02 14:08:31]   - /home/guest/.local/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+[2024-05-02 14:08:31] [pypath] 
+	- session ID: `2vxop`
+	- working directory: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex`
+	- logfile: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-2vxop.log`
+	- config: 
+		- /home/guest/.local/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+	- pypath version: 0.16.14
+	- imported from: `/home/guest/.local/lib/python3.11/site-packages/pypath`
+	- Python version: 3.11.8 (main, Feb 28 2024, 00:00:00) [GCC 13.2.1 20231011 (Red Hat 13.2.1-4)]
+	- Platform: Linux-6.8.7-100.fc38.x86_64-x86_64-with-glibc2.37
+[2024-05-02 14:08:31] [pypath] pypath
+[2024-05-02 14:08:32] [curl] Creating Curl object to retrieve data from `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources`
+[2024-05-02 14:08:32] [curl] Cache file path: `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:08:32] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:32] [curl] Loading data from cache previously downloaded from `www.ebi.ac.uk`
+[2024-05-02 14:08:32] [curl] Opening file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:08:32] [curl] Extracting data from file type `plain`
+[2024-05-02 14:08:32] [curl] Opening plain text file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:08:32] [curl] Contents of `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources` has been read and the file has been closed.
+[2024-05-02 14:08:32] [curl] File at `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources` successfully retrieved. Resulted file type `plain text, unicode string`. Local file at
+                      `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:08:33] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:08:33] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:08:33] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:33] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:08:33] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:08:33] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:08:33] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:08:33] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:33] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:08:33] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:08:33] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:08:33] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:08:33] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:33] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:08:33] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:08:35] [pypath] pypath
+[2024-05-02 14:08:35] [curl] Creating Curl object to retrieve data from `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources`
+[2024-05-02 14:08:35] [curl] Cache file path: `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:08:35] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:35] [curl] Loading data from cache previously downloaded from `www.ebi.ac.uk`
+[2024-05-02 14:08:35] [curl] Opening file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:08:35] [curl] Extracting data from file type `plain`
+[2024-05-02 14:08:35] [curl] Opening plain text file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:08:35] [curl] Contents of `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources` has been read and the file has been closed.
+[2024-05-02 14:08:35] [curl] File at `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources` successfully retrieved. Resulted file type `plain text, unicode string`. Local file at
+                      `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:08:35] [curl] Creating Curl object to retrieve data from `https://rampdb.nih.gov/api/id-types`
+[2024-05-02 14:08:35] [curl] Cache file path: `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types`
+[2024-05-02 14:08:35] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:35] [curl] Opening plain text file `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types`.
+[2024-05-02 14:08:35] [curl] Contents of `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types` has been read and the file has been closed.
+[2024-05-02 14:08:36] [network_resources] Could not find data model for resource `Negatome` in set `negative`.
+[2024-05-02 14:08:36] [network_resources] Could not find data model for resource `ORegAnno` in set `transcription_deprecated`.
+[2024-05-02 14:08:36] [resource_controller] Loading resource information from JSON file: /home/guest/.local/lib/python3.11/site-packages/pypath/resources/data/resources.json
+[2024-05-02 14:08:36] [resource_controller] Resource information has been read from `/home/guest/.local/lib/python3.11/site-packages/pypath/resources/data/resources.json`.
+[2024-05-02 14:08:36] [licenses] Populating license database from directory `/home/guest/.local/lib/python3.11/site-packages/pypath/data/licenses`.
+[2024-05-02 14:08:36] [licenses] Added license `AFL 3.0` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Apache 2.0` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Artistic-2.0` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `BioCarta` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `BSD` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY 2.5` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY 3.0` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY 4.0` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC-ND 3.0` (purpose = nonprofit, sharing = noderiv, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC-ND 4.0` (purpose = academic, sharing = noderiv, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC 2.0` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC 3.0` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC 4.0` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC-SA 3.0` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-NC-SA 4.0` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-ND 3.0` (purpose = commercial, sharing = noderiv, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-ND 4.0` (purpose = commercial, sharing = noderiv, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-SA 2.5` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-SA 3.0` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC BY-SA 4.0` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CC0 1.0` (purpose = commercial, sharing = free, attrib = noattrib).
+[2024-05-02 14:08:36] [licenses] Added license `CellCellInteractions` (purpose = non_profit, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Composite` (purpose = composite, sharing = composite, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `COSMIC` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `CytoSig` (purpose = non_profit, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `DSL` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `ELM` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `EMBL-EBI` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `EUL` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `GPLv2` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `GPLv3` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `LGPLv3` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `HGNC` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `HPO` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `HPRD` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `I2D` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Informal` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `KEGG` (purpose = ignore, sharing = ignore, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Kinase.com` (purpose = non_profit, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `miRecords` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `miRTarBase` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `MIT` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `MPPI` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `NAR Open Access` (purpose = commercial, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `No license` (purpose = ignore, sharing = ignore, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `OpenTargets` (purpose = academic, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `PathwayCommons` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `PDB` (purpose = commercial, sharing = free, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `PhosphoNetworks` (purpose = non_profit, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [licenses] Added license `Unspecified NC-SA` (purpose = academic, sharing = alike, attrib = attrib).
+[2024-05-02 14:08:36] [resource_controller] Updating resource license information.
+[2024-05-02 14:08:36] [resource_controller] No license for resource `3DComplex`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `Vidal HI-III`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `HumanSignalingNetwork`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `HI-union`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `CPDB`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `Laudanna-effects`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `Laudanna-directions`.
+[2024-05-02 14:08:36] [resource_controller] Could not find resource `reaction resources`.
+[2024-05-02 14:08:38] [curl] Creating Curl object to retrieve data from `https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 14:08:38] [curl] Cache file path: `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 14:08:38] [curl] Cache file found, no need for download.
+[2024-05-02 14:08:38] [curl] Loading data from cache previously downloaded from `storage.googleapis.com`
+[2024-05-02 14:08:38] [curl] Opening file `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 14:08:38] [curl] Extracting data from file type `zip`
+[2024-05-02 14:08:38] [curl] Opening zip file `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`.
+[2024-05-02 14:08:38] [curl] File at `https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip` successfully retrieved. Resulted file type `zip extracted data,
+                      dict of file objects`. Local file at `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`.

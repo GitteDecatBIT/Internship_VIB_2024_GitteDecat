@@ -1,0 +1,59 @@
+[2024-05-02 14:19:26] Welcome!
+[2024-05-02 14:19:26] Logger started, logging into `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-8d8uk.log`.
+[2024-05-02 14:19:26] Session `8d8uk` started.
+[2024-05-02 14:19:26] Config has been read from the following files:
+[2024-05-02 14:19:26]   - /home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-_mPOZatd-py3.11/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+[2024-05-02 14:19:26] [pypath] 
+	- session ID: `8d8uk`
+	- working directory: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex`
+	- logfile: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-8d8uk.log`
+	- config: 
+		- /home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-_mPOZatd-py3.11/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+	- pypath version: 0.16.10
+	- imported from: `/home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-_mPOZatd-py3.11/lib/python3.11/site-packages/pypath`
+	- Python version: 3.11.8 (main, Feb 28 2024, 00:00:00) [GCC 13.2.1 20231011 (Red Hat 13.2.1-4)]
+	- Platform: Linux-6.8.7-100.fc38.x86_64-x86_64-with-glibc2.37
+[2024-05-02 14:19:26] [pypath] pypath
+[2024-05-02 14:19:27] [curl] Creating Curl object to retrieve data from `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources`
+[2024-05-02 14:19:27] [curl] Cache file path: `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:19:27] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:27] [curl] Loading data from cache previously downloaded from `www.ebi.ac.uk`
+[2024-05-02 14:19:27] [curl] Opening file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:19:27] [curl] Extracting data from file type `plain`
+[2024-05-02 14:19:27] [curl] Opening plain text file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:19:27] [curl] Contents of `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources` has been read and the file has been closed.
+[2024-05-02 14:19:27] [curl] File at `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources` successfully retrieved. Resulted file type `plain text, unicode string`. Local file at
+                      `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:19:28] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:19:28] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:19:28] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:28] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:19:28] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:19:28] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:19:28] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:19:28] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:28] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:19:28] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:19:28] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-02 14:19:28] [curl] Cache file path: `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-02 14:19:28] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:28] [curl] Opening plain text file `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-02 14:19:28] [curl] Contents of `/home/guest/.cache/pypath/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-02 14:19:30] [pypath] pypath
+[2024-05-02 14:19:30] [curl] Creating Curl object to retrieve data from `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources`
+[2024-05-02 14:19:30] [curl] Cache file path: `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:19:30] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:30] [curl] Loading data from cache previously downloaded from `www.ebi.ac.uk`
+[2024-05-02 14:19:30] [curl] Opening file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`
+[2024-05-02 14:19:30] [curl] Extracting data from file type `plain`
+[2024-05-02 14:19:30] [curl] Opening plain text file `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:19:30] [curl] Contents of `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources` has been read and the file has been closed.
+[2024-05-02 14:19:30] [curl] File at `https://www.ebi.ac.uk/unichem/legacy/ucquery/listSources` successfully retrieved. Resulted file type `plain text, unicode string`. Local file at
+                      `/home/guest/.cache/pypath/ec334dad78a2cd7ed88f6069c63aa672-listSources`.
+[2024-05-02 14:19:30] [curl] Creating Curl object to retrieve data from `https://rampdb.nih.gov/api/id-types`
+[2024-05-02 14:19:30] [curl] Cache file path: `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types`
+[2024-05-02 14:19:30] [curl] Cache file found, no need for download.
+[2024-05-02 14:19:30] [curl] Opening plain text file `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types`.
+[2024-05-02 14:19:30] [curl] Contents of `/home/guest/.cache/pypath/c058901753f61743bf55db935731cff1-id-types` has been read and the file has been closed.
+[2024-05-02 14:19:30] [network_resources] Could not find data model for resource `Negatome` in set `negative`.
+[2024-05-02 14:19:30] [network_resources] Could not find data model for resource `ORegAnno` in set `transcription_deprecated`.

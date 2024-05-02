@@ -1,0 +1,25 @@
+[2024-05-02 12:16:34] Welcome!
+[2024-05-02 12:16:34] Logger started, logging into `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-ua6kd.log`.
+[2024-05-02 12:16:34] Session `ua6kd` started.
+[2024-05-02 12:16:34] Config has been read from the following files:
+[2024-05-02 12:16:34]   - /home/guest/.local/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+[2024-05-02 12:16:34] [pypath] 
+	- session ID: `ua6kd`
+	- working directory: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex`
+	- logfile: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex/pypath_log/pypath-ua6kd.log`
+	- config: 
+		- /home/guest/.local/lib/python3.11/site-packages/pypath_common/data/settings.yaml
+	- pypath version: 0.16.10
+	- imported from: `/home/guest/.local/lib/python3.11/site-packages/pypath`
+	- Python version: 3.11.8 (main, Feb 28 2024, 00:00:00) [GCC 13.2.1 20231011 (Red Hat 13.2.1-4)]
+	- Platform: Linux-6.8.7-100.fc38.x86_64-x86_64-with-glibc2.37
+[2024-05-02 12:16:34] [pypath] pypath
+[2024-05-02 12:16:34] [curl] Creating Curl object to retrieve data from `https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 12:16:34] [curl] Cache file path: `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 12:16:34] [curl] Cache file found, no need for download.
+[2024-05-02 12:16:34] [curl] Loading data from cache previously downloaded from `storage.googleapis.com`
+[2024-05-02 12:16:34] [curl] Opening file `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`
+[2024-05-02 12:16:34] [curl] Extracting data from file type `zip`
+[2024-05-02 12:16:34] [curl] Opening zip file `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`.
+[2024-05-02 12:16:34] [curl] File at `https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip` successfully retrieved. Resulted file type `zip extracted data,
+                      dict of file objects`. Local file at `/home/guest/.cache/pypath/3b052ae09d3ebdb3189f7ee2905dbe3b-7227.mitab.08-28-2023.txt.zip`.

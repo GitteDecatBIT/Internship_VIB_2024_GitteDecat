@@ -1,0 +1,28 @@
+2024-05-02 13:59:25,080	INFO	module:_logger
+This is BioCypher v0.5.41.
+2024-05-02 13:59:25,080	INFO	module:_logger
+Logging into `biocypher-log/biocypher-20240502-135925.log`.
+2024-05-02 13:59:25,080	DEBUG	module:_get
+Loading module biocypher._get.
+2024-05-02 13:59:25,086	DEBUG	module:_misc
+Loading module biocypher._misc.
+2024-05-02 13:59:25,404	DEBUG	module:_core
+Loading module biocypher._core.
+2024-05-02 13:59:25,406	DEBUG	module:_create
+Loading module biocypher._create.
+2024-05-02 13:59:25,410	DEBUG	module:_translate
+Loading module biocypher._translate.
+2024-05-02 13:59:25,411	DEBUG	module:_ontology
+Loading module biocypher._ontology.
+2024-05-02 13:59:25,505	DEBUG	module:_mapping
+Loading module biocypher._mapping.
+2024-05-02 13:59:25,506	DEBUG	module:_deduplicate
+Loading module biocypher._deduplicate.
+2024-05-02 13:59:25,507	DEBUG	module:_write
+Loading module biocypher.write._write.
+2024-05-02 13:59:25,508	DEBUG	module:_connect
+Loading module biocypher._connect.
+2024-05-02 13:59:31,426	INFO	module:Irefindex_adapter
+This is the link of IRefIndex data we downloaded:https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip. Please check if it is up to date
+2024-05-02 13:59:31,427	DEBUG	module:Irefindex_adapter
+Started downloading IRefIndex data

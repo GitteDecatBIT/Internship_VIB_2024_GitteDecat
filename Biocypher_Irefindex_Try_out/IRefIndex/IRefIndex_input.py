@@ -28,6 +28,7 @@ from numbers import Number
 
 import collections
 
+from IRefIndex_pypath_url import url as irefindex_url
 #from pypath_url import url 
 import pypath.share.curl as curl
 
@@ -36,11 +37,7 @@ import re
 print("running")
 
 
-def irefindex_interactions(
-        #organism: int = 7227,
-        htp_limit: Optional[Number] = 1,
-        ltp: bool = True,
-    ) -> List[tuple]:
+def irefindex_interactions():
 
     """
     Downloads and processes Physical multi-validated BioGRID interactions.
@@ -67,14 +64,13 @@ def irefindex_interactions(
     #organism = str(organism)
     interactions = []
     refc = []
-    url = 'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
+    url = irefindex_url.get("irefindex").get("url")
+    #'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
     c = curl.Curl(url, silent = False, large = True, slow = True)
     f = next(iter(c.result.values()))
     nul = f.readline()
 
     for l in f:
-
-
         l = l.split('\t')
 
         # PARTNER_A : finalReference A 
@@ -118,11 +114,11 @@ def irefindex_interactions(
         pattern_organism= r'taxid:(\d+)'
         match_organism= re.search(pattern_organism, input_organism)
         if match_organism:
-            organism = match_organism.group(1) # Extracting the number
+            organism = match_organism.group(1)
         else:
             organism = ""
 
-        print(organism)
+        #print(organism)
 
         interactions.append(
             IRefIndexPhysicalInteraction(
@@ -135,17 +131,11 @@ def irefindex_interactions(
         
         )
     
-        refc.append(pmid)
+        refc.extend(pmid)
 
     refc = collections.Counter(refc)
 
-    if htp_limit is not None:
-
-        interactions = [i for i in interactions if refc[i[2]] <= htp_limit]
-
-    return interactions
-    
-
+    #print(interactions)
 
 # Call the irefindex_interactions function
-irefindex_interactions()
+#irefindex_interactions()

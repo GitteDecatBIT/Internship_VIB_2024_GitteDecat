@@ -34,9 +34,19 @@ class BiogridEdgeFields(Enum):
     
 
 class BioGRID:
-    def __init__(self, output_dir = None, export_csvs = False, split_output = False, cache=False, debug=False, retries=6,
-                organism=9606, biogrid_fields: Union[None, list[BiogridEdgeFields]] = None, add_prefix = True, test_mode = False, aggregate_pubmed_ids: bool = True,
-                aggregate_methods: bool = True):
+    def __init__(self, 
+                 output_dir = None, 
+                 export_csvs = False, 
+                 split_output = False, 
+                 cache=False, 
+                 debug=False, 
+                 retries=6,
+                 organism=9606, 
+                 biogrid_fields: Union[None, list[BiogridEdgeFields]] = None, 
+                 add_prefix = True, 
+                 test_mode = False, 
+                 aggregate_pubmed_ids: bool = True,
+                 aggregate_methods: bool = True):
         """
         Downloads and processes BioGRID data
 
