@@ -15,3 +15,12 @@ poetry add pypath-omnipath
 
 same for bioregistry  
 poetry add bioregistry 
+
+
+Do it with the Crossbar github link
+
+git clone link
+cd folder that was created 
+peotry install
+poetry shell 
+peotry run python file (knowledge graph)

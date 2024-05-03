@@ -9,7 +9,17 @@ date: "2024-04-23"
 ...
 
 
-# 
+# TDP
+
+?????
+
+# Background information on the traineeship topic
+
+??????
+
+# Learning outcome 
+
+?????
 
 # ETN
 
@@ -27,9 +37,10 @@ https://github.com/HUBioDataLab/CROssBARv2/tree/main/bccb --> string_adapter.py
 Start working ETN in Markdown
 
 
-#### Thuesday 23/04/2024
+#### Tuesday 23/04/2024
 ###### Exploring code from Biocypher (adapter)\
 I tried to understand this string_adapter.py code and tried to run it in my virtual studio code. i came accros a few problems that i had to figure out. First of all i had to install Biocypher and create a poetry environment. In this environment i could run the script after i downloaded all the tools/packages that were needed and did not have installed on my system yet. 
+github: CROssBARv2/bccb/string_adapter.py
 
 **Installation:** 
 
@@ -75,16 +86,15 @@ Added new files to my github
 ##### Updated ETN\
 iupdated my ETN for the past days
 
-##### IRefIndex code for biocypher 
+##### IRefIndex code for biocypher\ 
 i tried figuring out the code on how biocypher is performed and how the adapter is created, with this information i tried to create the code for the IRefIndex database
 
-##### Run biocypher on Crossbar data
+##### Run biocypher on Crossbar data\
 i tried running biocypher with the crossbar data. i wanted to make sure that the code worked on my virtual studio code but i came across a few problems. 
-
 
 Problem: 
 try running crossbar --> could not import validation_class --> pypandtic and curies where not working together --> updated curies 
-could not 
+did not work
 
 ### Week 2
 
@@ -92,16 +102,31 @@ could not
 ##### Updated ETN\
 i updated my ETN for the week before friday
 
-##### Exploration of the Biogrid code from Crossbar
+##### Exploration of the Biogrid code from Crossbar\
 I tried figuring out which columns i need to use from the IRefIndex database. I did this based on the code from the Biogrid database. 
+github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
 
-#### Thuesday 30/04/2024
+#### Tuesday 30/04/2024
 ##### Updated ETN\
 i updated my ETN for the day before 
 
-#### Write TDP
+#### Write TDP\
 i started writing my documentation plan for the 8 weeks of the traineeship 
+github: Internship_VIB_2024_GitteDecat/ETN/
 
-##### Creating an adapter file for IRefIndex
+##### Creating an adapter file for IRefIndex\
 I created a script that takes the columns you need as input for the adapter file. i tried adapting the biogrid_adapter file to make it work for irefindex 
+github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
 
+
+#### Wednesday 01/05/2024
+#### Labour Day 
+Day off
+
+#### Thursday 02/05/2024
+#### Submitted TDP (external supervisor)\
+i send my  first version of the TDP to my external supervisor of VIB and he gave me some feedback
+github: Internship_VIB_2024_GitteDecat/ETN/
+#### Creating adapter file for IRefIndex\
+I tried figuring out how to map the refseq accession number to the uniprot id ( using biogrid as a example)
+github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
