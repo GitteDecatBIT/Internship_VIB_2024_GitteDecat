@@ -8,18 +8,76 @@ date: "2024-04-23"
 
 ...
 
-
-# TDP
-
-?????
-
 # Background information on the traineeship topic
 
 ??????
 
-# Learning outcome 
+# TDP
 
-?????
+Traineeship documentation plan (TDP)
+Student: Gitte Decat 		Traineeship supervisor: Alexander Botzki 
+-----------------------------------------------------------------------------------------------------------------------------
+Tentative planning: 
+During this traineeship I will work with Biocypher. Biocypher is created to retrieve information about certain interactions and create a knowledge graph. You can retrieve information about  gene-gene interactions, protein-protein interactions, gene-disease interactions, metabolic interactions and biological processes. With this information biocypher will create a visual representation of the complexes. 
+To ben able to create a knowledge graph you need results from a database. Biocypher uses a collection of reusable “adapters” for different sources of biomedical knowledge. Due to the use of adapters a reproducible knowledge graph  can be created and shared for every specific task. 
+VIB works with the database IRefIndex and would like to be able to use biocypher to create a knowledge graph. The problem is that there is not a adapter available for the IRefIndex database. In this adapter has to be defined where you can find specific information and what has to happen with that information. In particular they want to get information about the protein-protein interactions when creating the knowledge graph. 
+These tasks will be performed during the traineeship from 22/04/2024 till 14/06/2024.
+Data management 
+All the information that is collected during this traineeship can be found in this github page: https://github.com/GitteDecatBIT/Internship_VIB_2024_GitteDecat.git
+In this github repository you can find everything from tutorials, to a workflow and code that is written during the traineeship. The code will be created based on the tutorials that are given by biocypher itself and are find on the website. The github repository that includes the tutorial can be find here: https://github.com/biocypher/project-template.git
+Next to the tutorials I will created the adapter file based on the adapter files that can be found in the CROssBARv2 github repository. In this repository, you can find multiple adapter files for various types of information. The adapter files that are created for Biogrid and stringdb fwill be used as an example to create the adapter file for IRefIdex, because there is some similarity between them. This will make it easier to understand the code/logic behind the adapter file. The github repository that includes the CROssBARv2 files can be find here: https://github.com/HUBioDataLab/CROssBARv2.git 
+
+
+FAIR principles: 
+-	Findable:
+The data that is used comes from the IRefIndex database. This can be found on https://irefindex.vib.be/wiki/index.php/iRefIndex . In this database has each interactor a unique identifier and has metadata available. Further a key is generated for each protein interaction record and for each participant protein. 
+At the end of the traineeship, a zip file will be created of the Internship_VIB_2024_GitteDecat github repository and will be given to VIB. 
+
+-	Accessible: 
+The iRefIndex database can be accessed via the following link:   https://irefindex.vib.be/wiki/index.php/iRefIndex . This is open and free and a PSI-MITAB tab-delimited format is used.
+
+-	Interoperable: 
+The iRefIndex data is available in PSI-MITAB 2.6 tab-delimited format.
+
+-	Reusable: 
+By providing well-structured, well-documented, and openly accessible protein-protein interaction data is IRefIndex reusable and can be integrated with other databases and tools.
+
+Traceability of steps and methods
+The ETN with the project steps can be found on the same github page as mentioned before. Everyday the different steps that were performed are documented in the markdown file called ETN_Gitte_Decat.Rmd. 
+Version control of code
+The status of my github is set on public, so that the github page is available for everyone. At the end of the traineeship, a zip file will be created from the github repository and this will uploaded/send to the traineeship supervisor from VIB and shared with Howest.
+
+
+
+
+# Learning outcome 
+Learning outcome (LO)
+Student: Gitte Decat 		Traineeship supervisor: Alexander Botzki 
+-----------------------------------------------------------------------------------------------------------------------------
+Development goal: 
+Improve my Python coding skills and understanding the logic behind the codes. Along with understanding how all the scripts used in Biocypher are connected to each other. This also means understanding what every package/library does and where the information comes from. 
+
+Development activity 
+I will be working with biocypher and the IRefIndex database during this traineeship. The goal is to provide VIB with an adapter file for IRefIndex that can be used with Biocypher. I have to do a lot of research on how these adapters are formulated. They use the packages pypath and this is new to me, so I have to analyse all the components that can be find in this packages and where to use it/ adapt it for me use. 
+At last I should be in contact with a person from Biocypher to let them know that I might have an extra adapter that can be used with Biocypher. These people should than look at my code and say if it is correct and if they even want to include to Biocypher and make it available for other users.
+
+Desired results
+At the endof the traineeship I would like to be able to write a Python script (adapter file) that makes it able to use IRefIndex in Biocypher.
+
+Schedule 
+These activities will be performed during the traineeship from 22/04/2024 till 14/06/2024.
+
+Necessary support and facilities 
+To obtain my goal I will need my traineeship working hours and learning materials such as the IREfIndex database and the Biocypher website that includes: information about the concept, tutorials and the CROssBAR project. 
+
+SMART principles 
+Specific: Creating an python script to be able to use IRefIndex together with Biocypher.
+Measurable:  At the end of the traineeship I should be able to use the adapter file for IRefindex together with Biocypher and create a knowledge graph. 
+Achievable:  With the time and help I can get at VIB I should be able to create the adapter file. 
+Relevant: In the context of the traineeship, this learning outcome can be considered relevant.  
+Time-bound: This learning outcome should be completed by the end of the traineeship. 
+
+
 
 # ETN
 
@@ -110,7 +168,7 @@ github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
 ##### Updated ETN\
 i updated my ETN for the day before 
 
-#### Write TDP\
+##### Write TDP\
 i started writing my documentation plan for the 8 weeks of the traineeship 
 github: Internship_VIB_2024_GitteDecat/ETN/
 
@@ -120,13 +178,32 @@ github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
 
 
 #### Wednesday 01/05/2024
-#### Labour Day 
+##### Labour Day 
 Day off
 
 #### Thursday 02/05/2024
-#### Submitted TDP (external supervisor)\
+##### Submitted TDP (external supervisor)\
 i send my  first version of the TDP to my external supervisor of VIB and he gave me some feedback
 github: Internship_VIB_2024_GitteDecat/ETN/
-#### Creating adapter file for IRefIndex\
+
+##### Creating adapter file for IRefIndex\
 I tried figuring out how to map the refseq accession number to the uniprot id ( using biogrid as a example)
 github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
+
+
+#### Firday 03/05/2024
+##### Rewrite TDP\
+i took the feedback from my external supervisor into account and rewrited my TDP to make it more clear and uploaded it to the one drive 
+
+##### Write LO\ 
+i wrote my learning outcome and uploaded it to the one drive 
+
+##### Updated ETN\ 
+Updated ETN for the last few days 
+
+##### Upload everything to github\
+I uploaded everything to github so that all the information is there for the first time we had to submit the TDP/ETN
+
+##### Creating adapter file for IRefIndex\
+
+## Problems 

@@ -24,3 +24,8 @@ cd folder that was created
 peotry install
 poetry shell 
 peotry run python file (knowledge graph)
+
+when running it --> it keeps going for a long time at the update_process part
+^CTraceback (most recent call last):
+  File "/home/guest/.cache/pypoetry/virtualenvs/bccb-FmSLJcNW-py3.11/lib/python3.11/site-packages/pypath/share/curl.py", line 1548, in update_progress
+    def update_progress(self, download_total, downloaded, upload_total,
