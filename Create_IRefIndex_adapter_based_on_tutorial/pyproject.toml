@@ -12,6 +12,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 biocypher = "^0.5.37"
+pypath = "^0.1"
+pypath-omnipath = "^0.16.10"
 
 [build-system]
 requires = ["poetry-core"]

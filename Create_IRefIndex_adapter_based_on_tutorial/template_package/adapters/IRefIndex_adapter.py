@@ -5,6 +5,14 @@ from itertools import chain
 from typing import Optional
 from biocypher._logger import logger
 
+
+# extra from CROssBAR
+from contextlib import ExitStack
+from time import time
+from template_package.adapters.CROssBAR_IRefIndex_input import irefindex_interactions
+from template_package.adapters.CROssBAR_IRefIndex_pypath_url import url as irefindex_url
+from pypath.share import curl
+
 logger.debug(f"Loading module {__name__}.")
 
 
@@ -64,6 +72,11 @@ class ExampleAdapterProteinDiseaseEdgeField(Enum):
     ASSOCIATION_TYPE = "association_type"
     ASSOCIATION_SOURCE = "association_source"
 
+class IRefIndexEdgeFields(Enum):
+    SOURCE = "source"
+    PUBMED_IDS = "pmid"
+    METHOD = "method"
+    
 
 class ExampleAdapter:
     """
@@ -83,9 +96,41 @@ class ExampleAdapter:
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,
+        test_mode = True, # change to false if you want the intire dataset
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
+        self.test_mode = test_mode
 
+    def download_irefindex_data(self):
+        
+        """
+        Wrapper function to download IRefIndex data using pypath; used to access
+        settings.
+            
+        To do: Make arguments of irefindex_all_interactions selectable for user. 
+        
+        """
+
+        t0 = time()
+
+        with ExitStack() as stack:                         
+            # download irefindex data
+            self.irefindex_ints = irefindex_interactions()
+
+
+
+            logger.info(f"This is the link of IRefIndex data we downloaded:{irefindex_url}. Please check if it is up to date")    
+            logger.debug("Started downloading IRefIndex data")
+
+        # devides into a smaller subset of data 
+        if self.test_mode:
+            self.irefindex_ints = self.irefindex_ints[:100]            
+                    
+
+        t1 = time()
+        logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
+
+            
     def get_nodes(self):
         """
         Returns a generator of node tuples for node types specified in the
