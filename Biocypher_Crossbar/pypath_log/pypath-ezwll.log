@@ -1,0 +1,27 @@
+[2024-05-03 12:37:48] Welcome!
+[2024-05-03 12:37:48] Logger started, logging into `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar/pypath_log/pypath-ezwll.log`.
+[2024-05-03 12:37:48] Session `ezwll` started.
+[2024-05-03 12:37:48] [pypath] 
+	- session ID: `ezwll`
+	- working directory: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar`
+	- logfile: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar/pypath_log/pypath-ezwll.log`
+	- pypath version: 0.15.4
+[2024-05-03 12:37:50] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:37:50] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:37:50] [curl] Cache file found, no need for download.
+[2024-05-03 12:37:50] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:37:50] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-03 12:37:51] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:37:51] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:37:51] [curl] Cache file found, no need for download.
+[2024-05-03 12:37:51] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:37:51] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-03 12:37:52] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:37:52] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:37:52] [curl] Cache file found, no need for download.
+[2024-05-03 12:37:52] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:37:52] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-03 12:37:54] [network_resources] Could not find data model for resource `Negatome` in set `negative`.
+[2024-05-03 12:37:54] [network_resources] Could not find data model for resource `SignaLink2` in set `obsolate`.
+[2024-05-03 12:37:54] [network_resources] Could not find data model for resource `NCI-PID` in set `obsolate`.
+[2024-05-03 12:37:54] [network_resources] Could not find data model for resource `ORegAnno` in set `transcription_deprecated`.

@@ -37,7 +37,6 @@ import pandas as pd
 
 print("running")
 
-
 def irefindex_interactions():
 
     """
@@ -74,7 +73,6 @@ def irefindex_interactions():
     for l in f:
         l = l.split('\t')
 
-        """
         # PARTNER_A : finalReference A 
         input_partner_a = l[38]
         parts = input_partner_a.split(":") # Splitting the string at ":"
@@ -84,7 +82,6 @@ def irefindex_interactions():
             partner_a = ""
         #print("partner_a: {}".format(partner_a))
 
-
         # PARTNER_B: FinalReference B 
         input_partner_b = l[39] 
         parts = input_partner_b.split(":")  # Splitting the string at ":"        
@@ -93,7 +90,6 @@ def irefindex_interactions():
         else:   
             partner_b = ""  
         #print("partner_b: {}".format(partner_b))    
-
 
         # PUBMED_ID
         input_pmid = l[8]
@@ -120,9 +116,30 @@ def irefindex_interactions():
         else:
             organism = ""
 
-        #print(organism)
-        """
 
+        #print(organism)
+        interactions.append(
+            IRefIndexPhysicalInteraction(
+                partner_a = partner_a,
+                partner_b = partner_b,
+                pmid= pmid, 
+                method= method, 
+                organism= organism,  
+            )
+        
+        )
+    
+        refc.extend(pmid)
+
+    refc = collections.Counter(refc)
+
+    #print(interactions)
+
+# Call the irefindex_interactions function
+#irefindex_interactions()        
+
+
+"""
         #PARTNER_A
         input_partner_a = {
             'FinalReferenceA': [
@@ -212,24 +229,27 @@ def irefindex_interactions():
 
         # Display the DataFrame
         print(df_organism)
-
+        """
         
-        interactions.append(
-            IRefIndexPhysicalInteraction(
-                partner_a = df_partner_a.Accession,
-                partner_b = df_partner_b,
-                pmid= df_pmid, 
-                method= df_method, 
-                organism= df_organism,  
-            )
-        
-        )
-    
-        refc.extend(pmid)
 
-    refc = collections.Counter(refc)
+def irefindex_species() -> dict[int,str]:
+    organism = {}
 
-    #print(interactions)
+    url = irefindex_url.get("irefindex").get("url")
+    #'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
+    c = curl.Curl(url, silent = False, large = True, slow = True)
+    f = next(iter(c.result.values()))
+    nul = f.readline()
 
-# Call the irefindex_interactions function
-irefindex_interactions()
+    for l in f:
+            l = l.split('\t')
+            # ORGANISM
+            input_organism= l[10]
+            pattern_organism= r'taxid:(\d+)'
+            match_organism= re.search(pattern_organism, input_organism)
+    if match_organism:
+            organism = match_organism.group(1) 
+    else:
+            organism = ""
+
+    return organism 

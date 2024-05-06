@@ -9,14 +9,10 @@ from typing import Union
 from pathlib import Path
 from time import time
 
-#import sys
-#sys.path.append('/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Irefindex/IRefIndex')  
 
-from IRefIndex_pypath_url import url as irefindex_url
-from IRefIndex_input import irefindex_interactions
-#import IRefIndex_input  # Now you can import script1
-#from pypath.inputs import biogrid, uniprot
 from pypath.inputs import uniprot
+from IRefIndex_input import irefindex_interactions, irefindex_species
+from IRefIndex_pypath_url import url as irefindex_url
 from pypath.share import curl, settings
 
 from tqdm import tqdm # progress bar
@@ -44,22 +40,7 @@ class IRefIndexEdgeFields(Enum):
 
 
 class IRefIndex:
-    url = irefindex_url.get("irefindex").get("url")
-    #'https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip'
-    c = curl.Curl(url, silent = False, large = True, slow = True)
-    f = next(iter(c.result.values()))
-    nul = f.readline()
 
-    for l in f:
-        l = l.split('\t')
-        # ORGANISM
-        input_organism= l[10]
-        pattern_organism= r'taxid:(\d+)'
-        match_organism= re.search(pattern_organism, input_organism)
-        if match_organism:
-            organism = match_organism.group(1) 
-        else:
-            organism = ""
 
     def __init__(self, 
                  output_dir = None, 
@@ -68,7 +49,7 @@ class IRefIndex:
                  cache=False, 
                  debug=False, 
                  retries=6,
-                 organism=organism, 
+                 organism=irefindex_species, 
                  irefindex_fields: Union[None, list[IRefIndexEdgeFields]] = None, 
                  add_prefix = True, 
                  test_mode = False, 
@@ -107,10 +88,12 @@ class IRefIndex:
         self.aggregate_dict = {IRefIndexEdgeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
                                IRefIndexEdgeFields.METHOD.value:aggregate_methods}
 
+
         if export_csvs:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
             self.output_dir = output_dir
     
+
     def export_dataframe(self, dataframe, data_label):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -127,15 +110,15 @@ class IRefIndex:
         return output_path
     
     def download_irefindex_data(self):
+        
         """
         Wrapper function to download IRefIndex data using pypath; used to access
         settings.
             
         To do: Make arguments of irefindex_all_interactions selectable for user. 
-        """
         
-        logger.info(f"This is the link of IRefIndex data we downloaded:{IRefIndex.url}. Please check if it is up to date")    
-        logger.debug("Started downloading IRefIndex data")
+        """
+
         t0 = time()
 
         with ExitStack() as stack:                         
@@ -146,13 +129,28 @@ class IRefIndex:
             if not self.cache:
                 stack.enter_context(curl.cache_off())
 
+            if self.organism is None:
+                species =irefindex_species()
+                self.tax_ids = list(species.keys())
+            else:
+                self.tax_ids = [self.organism]
+
             # download irefindex data
             self.irefindex_ints = irefindex_interactions()
-                        
-            # download these fields for mapping from refseq to uniprot id   
-             
-            self.uniprot_to_refseq = uniprot.uniprot_data("xref_refseq", "*", True) ### ???
-            self.uniprot_to_tax = uniprot.uniprot_data("organism_id", "*", True)
+
+            # map refseq ids to swissprot ids
+            uniprot_to_refseq = uniprot.uniprot_data("xref_refseq", "*", True)
+            
+            self.refseq_to_uniprot = collections.defaultdict(list)
+            for k,v in uniprot_to_refseq.items():
+                for refseq_id in list(filter(None, v.split(";"))):
+                    self.refseq_to_uniprot[refseq_id.split(".")[1]].append(k)
+
+        
+
+            logger.info(f"This is the link of IRefIndex data we downloaded:{IRefIndex.url}. Please check if it is up to date")    
+            logger.debug("Started downloading IRefIndex data")
+
             
             
         if self.test_mode:
@@ -162,14 +160,181 @@ class IRefIndex:
         logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
 
 
- # Instantiate the BioGRID class
-irefindex_instance = IRefIndex()
 
-# Download BioGRID data
-irefindex_instance.download_irefindex_data()
 
-# Process BioGRID data
-#irefindex_instance.irefindex_process()
 
-# Print final BioGRID interactions
-#print(irefindex_instance.final_biogrid_ints)
+
+    def biogrid_process(self, rename_selected_fields: Union[None, list[str]] = None) -> None:
+        """
+        Processor function for BioGRID data. It drops duplicate and reciprocal duplicate protein pairs and collects pubmed ids of duplicated pairs. In addition, it
+        maps entries to uniprot ids using gene name and tax id information in the BioGRID data. Also, it filters protein pairs found in swissprot.
+        
+         Args:
+            rename_selected_fields : List of new field names for selected fields. If not defined, default field names will be used.
+        """
+        
+        selected_fields = self.set_edge_fields()
+            
+        default_field_names = {"source":"source", "pmid":"pubmed_ids", "method":"method"}
+        
+        self.biogrid_field_new_names = {}
+        
+        if rename_selected_fields:
+            if len(selected_fields) != len(rename_selected_fields):
+                raise Exception("Length of selected_fields variable should be equal to length of rename_selected_fields variable")
+            
+            for field_old_name, field_new_name in list(zip(selected_fields, rename_selected_fields)):
+                self.biogrid_field_new_names[field_old_name] = field_new_name
+            
+            self.biogrid_field_new_names["uniprot_a"] = "uniprot_a"
+            self.biogrid_field_new_names["uniprot_b"] = "uniprot_b"
+        else:
+            for field_old_name in selected_fields:
+                self.biogrid_field_new_names[field_old_name] = default_field_names[field_old_name]
+            
+            self.biogrid_field_new_names["uniprot_a"] = "uniprot_a"
+            self.biogrid_field_new_names["uniprot_b"] = "uniprot_b"
+        
+        
+        logger.debug("Started processing BioGRID data")
+        t1 = time()
+                         
+        # create dataframe          
+        biogrid_df = pd.DataFrame.from_records(self.biogrid_ints, columns=self.biogrid_ints[0]._fields)
+
+        # biogrid id (gene symbols) to uniprot id mapping
+        biogrid_df['partner_a'] = biogrid_df['partner_a'].str.upper()
+        biogrid_df['partner_b'] = biogrid_df['partner_b'].str.upper()
+                         
+        gene_to_uniprot = collections.defaultdict(list)
+        for k,v in self.uniprot_to_gene.items():
+            for gene in v.split():
+                gene_to_uniprot[gene.upper()].append(k)
+
+        prot_a_uniprots = []
+        for prot, tax in zip(biogrid_df['partner_a'], biogrid_df['tax_a']):
+            uniprot_id_a = (
+                ";".join([_id for _id in gene_to_uniprot[prot] if tax == self.uniprot_to_tax[_id]])
+                    if prot in gene_to_uniprot else
+                None)
+            prot_a_uniprots.append(uniprot_id_a)
+
+        prot_b_uniprots = []
+        for prot, tax in zip(biogrid_df['partner_b'], biogrid_df['tax_b']):
+            uniprot_id_b = (
+                ";".join([_id for _id in gene_to_uniprot[prot] if tax == self.uniprot_to_tax[_id]])
+                    if prot in gene_to_uniprot else
+                None)
+            prot_b_uniprots.append(uniprot_id_b)
+
+        biogrid_df["uniprot_a"] = prot_a_uniprots
+        biogrid_df["uniprot_b"] = prot_b_uniprots
+        
+        biogrid_df.fillna(value=np.nan, inplace=True)
+        
+        # add source database info
+        biogrid_df["source"] = "BioGRID"
+        # filter selected fields
+        biogrid_df = biogrid_df[list(self.biogrid_field_new_names.keys())]
+        # rename columns
+        biogrid_df.rename(columns=self.biogrid_field_new_names, inplace=True)
+        
+        # drop rows that have semicolon (";")
+        biogrid_df.drop(biogrid_df[(biogrid_df["uniprot_a"].str.contains(";")) | (biogrid_df["uniprot_b"].str.contains(";"))].index, axis=0, inplace=True)
+        biogrid_df.reset_index(drop=True, inplace=True)
+        
+        # drop rows if uniprot_a or uniprot_b is not a swiss-prot protein
+        biogrid_df = biogrid_df[(biogrid_df["uniprot_a"].isin(self.swissprots)) & (biogrid_df["uniprot_b"].isin(self.swissprots))]
+        biogrid_df.reset_index(drop=True, inplace=True)
+        
+        # drop duplicates if same a x b pair exists multiple times 
+        # keep the first pair and collect pubmed ids of duplicated a x b pairs in that pair's pubmed id column
+        # if a x b pair has same experimental system type with b x a pair, drop b x a pair
+        biogrid_df_unique = biogrid_df.dropna(subset=["uniprot_a", "uniprot_b"]).reset_index(drop=True)        
+        
+        
+        def aggregate_fields(element):
+            element = "|".join([str(e) for e in set(element.dropna())])
+            if not element:
+                return np.nan
+            else:
+                return element
+            
+        if any(list(self.aggregate_dict.values())):
+            agg_field_list = [k for k, v in self.aggregate_dict.items() if v]
+            
+            agg_dict = {}            
+            for k, v in self.biogrid_field_new_names.items():
+                if k in agg_field_list:
+                    agg_dict[v] = aggregate_fields
+                else:                
+                    agg_dict[v] = "first"
+        
+        biogrid_df_unique = biogrid_df_unique.groupby(["uniprot_a", "uniprot_b"], sort=False, as_index=False).aggregate(agg_dict)
+        #biogrid_df_unique["pubmed_id"].replace("", np.nan, inplace=True)
+        
+        if "experimental_system" in self.biogrid_field_new_names.keys():            
+            biogrid_df_unique = biogrid_df_unique[~biogrid_df_unique[["uniprot_a", "uniprot_b", self.biogrid_field_new_names["experimental_system"]]].apply(frozenset, axis=1).duplicated()].reset_index(drop=True)
+        else:
+            biogrid_df_unique = biogrid_df_unique[~biogrid_df_unique[["uniprot_a", "uniprot_b"]].apply(frozenset, axis=1).duplicated()].reset_index(drop=True)
+
+        if self.export_csvs:
+            biogrid_output_path = self.export_dataframe(biogrid_df_unique, "biogrid")
+            logger.info(f'Final BioGRID data is written: {biogrid_output_path}')
+
+        self.final_biogrid_ints = biogrid_df_unique
+        
+        t2 = time()
+        logger.info(f'BioGRID data is processed in {round((t2-t1) / 60, 2)} mins')
+            
+    def set_edge_fields(self) -> list:
+        """
+        Sets biogrid edge fields
+        Returns:
+            selected field list
+        """
+        if self.biogrid_fields is None:
+            return [field.value for field in BiogridEdgeFields]
+        else:
+            return [field.value for field in self.biogrid_fields]
+        
+    def add_prefix_to_id(self, prefix="uniprot", identifier=None, sep=":") -> str:
+        """
+        Adds prefix to uniprot id
+        """
+        if self.add_prefix and identifier:
+            return normalize_curie( prefix + sep + str(identifier))
+        
+        return identifier
+        
+        
+    def get_biogrid_edges(self) -> list:
+        """
+        Get PPI edges from biogrid data
+        """
+        
+        # create edge list
+        edge_list = []
+        
+        for index, row in tqdm(self.final_biogrid_ints.iterrows(), total=self.final_biogrid_ints.shape[0]):
+            _dict = row.to_dict()
+            
+            _source = self.add_prefix_to_id(identifier = _dict["uniprot_a"])
+            _target = self.add_prefix_to_id(identifier = _dict["uniprot_b"])
+            
+            del _dict["uniprot_a"], _dict["uniprot_b"]
+            
+            _props = dict()
+            for k, v in _dict.items():
+                if str(v) != "nan":
+                    if isinstance(v, str) and "|" in v:
+                        # if column has multiple entries create list
+                        _props[str(k).replace(" ","_").lower()] = v.split("|")
+                    else:
+                        _props[str(k).replace(" ","_").lower()] = v
+           
+
+            edge_list.append((None, _source, _target, "Interacts_With", _props))
+            
+            
+        return edge_list

@@ -1,0 +1,23 @@
+[2024-05-03 12:38:22] Welcome!
+[2024-05-03 12:38:22] Logger started, logging into `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar/pypath_log/pypath-vpdyj.log`.
+[2024-05-03 12:38:22] Session `vpdyj` started.
+[2024-05-03 12:38:22] [pypath] 
+	- session ID: `vpdyj`
+	- working directory: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar`
+	- logfile: `/home/guest/Github/Internship_VIB_2024_GitteDecat/Biocypher_Crossbar/pypath_log/pypath-vpdyj.log`
+	- pypath version: 0.15.4
+[2024-05-03 12:38:23] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:38:23] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:38:23] [curl] Cache file found, no need for download.
+[2024-05-03 12:38:23] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:38:23] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-03 12:38:24] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:38:24] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:38:24] [curl] Cache file found, no need for download.
+[2024-05-03 12:38:24] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:38:24] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
+[2024-05-03 12:38:25] [curl] Creating Curl object to retrieve data from `https://www.ensembl.org/info/about/species.html`
+[2024-05-03 12:38:25] [curl] Cache file path: `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`
+[2024-05-03 12:38:25] [curl] Cache file found, no need for download.
+[2024-05-03 12:38:25] [curl] Opening plain text file `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html`.
+[2024-05-03 12:38:25] [curl] Contents of `/home/guest/.pypath/cache/535b06d53a59e75bb693369bc5fdc556-species.html` has been read and the file has been closed.
