@@ -79,7 +79,7 @@ class ExampleAdapter:
 
     def __init__(
         self,
-        node_types: Optional[list] = None,
+        node_types: ExampleAdapterNodeType.PROTEIN,
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,
@@ -104,6 +104,26 @@ class ExampleAdapter:
 
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
+    
+    get_nodes()
+
+
+# Instantiate an ExampleAdapter object
+adapter = ExampleAdapter(
+    node_types=ExampleAdapterNodeType.PROTEIN, 
+    node_fields=[ExampleAdapterProteinField.ID], 
+    edge_types=ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION, 
+)
+    # Assuming you have already instantiated an ExampleAdapter object called 'adapter'
+# adapter = ExampleAdapter(...)
+
+# Call the get_nodes method on the adapter instance
+nodes_generator = ExampleAdapter.get_nodes()
+
+# You can iterate over the generator to get the node tuples
+for node_tuple in nodes_generator:
+    print(node_tuple)
+
 
     def get_edges(self, probability: float = 0.3):
         """

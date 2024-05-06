@@ -206,4 +206,14 @@ I uploaded everything to github so that all the information is there for the fir
 
 ##### Creating adapter file for IRefIndex\
 
+### Week 3
+
+#### Monday 06/05/2024
+##### Create adapter file based on biocypher tutorial\
+I tried creating the adapter file based on the tutorial from biocypher to have a script that works. I i try to run the adapter file based on the Crossbar files it does not work. therefore i went back to an more easier example to take as a base. 
+i added some parts from the crossbar based file to make it more specific for IRefIndex 
+##### Updated ETN\ 
+Updated ETN for the this day 
+
+
 ## Problems 

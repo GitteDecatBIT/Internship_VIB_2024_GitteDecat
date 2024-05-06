@@ -5,6 +5,7 @@ from template_package.adapters.IRefIndex_adapter import (
     ExampleAdapterEdgeType,
     ExampleAdapterProteinField,
     ExampleAdapterDiseaseField,
+    IRefIndexEdgeFields,
 )
 
 # Instantiate the BioCypher interface
@@ -49,11 +50,19 @@ edge_types = [
     ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION,
 ]
 
+edge_fields = [
+    IRefIndexEdgeFields.SOURCE,
+    IRefIndexEdgeFields.PUBMED_IDS,
+    IRefIndexEdgeFields.METHOD,
+]
+
 # Create a protein adapter instance
 adapter = ExampleAdapter(
     node_types=node_types,
     node_fields=node_fields,
     edge_types=edge_types,
+    edge_fields= edge_fields,
+
     # we can leave edge fields empty, defaulting to all fields in the adapter
 )
 

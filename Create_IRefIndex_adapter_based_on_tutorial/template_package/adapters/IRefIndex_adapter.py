@@ -9,9 +9,11 @@ from biocypher._logger import logger
 # extra from CROssBAR
 from contextlib import ExitStack
 from time import time
-from template_package.adapters.CROssBAR_IRefIndex_input import irefindex_interactions
+from template_package.adapters.CROssBAR_IRefIndex_input import irefindex_interactions,irefindex_species
 from template_package.adapters.CROssBAR_IRefIndex_pypath_url import url as irefindex_url
-from pypath.share import curl
+from pypath.share import curl, settings
+import re
+from typing import Union
 
 logger.debug(f"Loading module {__name__}.")
 
@@ -76,6 +78,7 @@ class IRefIndexEdgeFields(Enum):
     SOURCE = "source"
     PUBMED_IDS = "pmid"
     METHOD = "method"
+
     
 
 class ExampleAdapter:
@@ -89,17 +92,22 @@ class ExampleAdapter:
         edge_types: List of edge types to include in the result.
         edge_fields: List of edge fields to include in the result.
     """
-
+    
     def __init__(
         self,
-        node_types: Optional[list] = None,
-        node_fields: Optional[list] = None,
-        edge_types: Optional[list] = None,
-        edge_fields: Optional[list] = None,
-        test_mode = True, # change to false if you want the intire dataset
+        node_types: ExampleAdapterNodeType.PROTEIN,
+        node_fields: ExampleAdapterProteinField,
+        edge_types: ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
+        edge_fields: Union[None, list[IRefIndexEdgeFields]] = None,
+        test_mode = False, # change to false if you want the intire dataset
+        organism= irefindex_species,
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
         self.test_mode = test_mode
+        self.organism = organism
+
+
+ 
 
     def download_irefindex_data(self):
         
@@ -113,10 +121,21 @@ class ExampleAdapter:
 
         t0 = time()
 
-        with ExitStack() as stack:                         
+        with ExitStack() as stack:   
+            stack.enter_context(settings.context(retries=self.retries))
+            
+            if self.debug:                
+                stack.enter_context(curl.debug_on())
+            if not self.cache:
+                stack.enter_context(curl.cache_off())
+
+            if self.organism is None:
+                species =irefindex_species()
+                self.tax_ids = list(species.keys())
+            else:
+                self.tax_ids = [self.organism]                      
             # download irefindex data
             self.irefindex_ints = irefindex_interactions()
-
 
 
             logger.info(f"This is the link of IRefIndex data we downloaded:{irefindex_url}. Please check if it is up to date")    
@@ -130,6 +149,7 @@ class ExampleAdapter:
         t1 = time()
         logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
 
+    download_irefindex_data(self)
             
     def get_nodes(self):
         """
@@ -142,10 +162,10 @@ class ExampleAdapter:
         self.nodes = []
 
         if ExampleAdapterNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields)) for _ in range(100)]
+            [self.nodes.append(Protein(fields=self.node_fields))for _ in range(100)]
 
-        if ExampleAdapterNodeType.DISEASE in self.node_types:
-            [self.nodes.append(Disease(fields=self.node_fields)) for _ in range(100)]
+        #if ExampleAdapterNodeType.DISEASE in self.node_types:
+         #   [self.nodes.append(Disease(fields=self.node_fields)) for _ in range(100)]
 
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
@@ -196,7 +216,7 @@ class ExampleAdapter:
                     node.get_id(),
                     other_node.get_id(),
                     edge_type,
-                    {"example_property": "example_value"},
+                    {"example_property": "example_value"}, #### ????
                 )
 
     def get_node_count(self):
@@ -309,7 +329,7 @@ class Protein(Node):
 
         ## taxon
         if self.fields is not None and ExampleAdapterProteinField.TAXON in self.fields:
-            properties["taxon"] = "9606"
+            properties["taxon"] = irefindex_species
 
         return properties
 
@@ -352,3 +372,7 @@ class Disease(Node):
             )
 
         return properties
+
+
+    
+
