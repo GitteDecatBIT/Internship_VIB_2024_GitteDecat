@@ -28,7 +28,6 @@ print(paths)
 # These are defined in the adapter (`adapter.py`).
 node_types = [
     ExampleAdapterNodeType.PROTEIN,
-    ExampleAdapterNodeType.DISEASE,
 ]
 
 # Choose protein adapter fields to include in the knowledge graph.
@@ -39,15 +38,12 @@ node_fields = [
     ExampleAdapterProteinField.SEQUENCE,
     ExampleAdapterProteinField.DESCRIPTION,
     ExampleAdapterProteinField.TAXON,
-    # Diseases
-    ExampleAdapterDiseaseField.ID,
-    ExampleAdapterDiseaseField.NAME,
-    ExampleAdapterDiseaseField.DESCRIPTION,
+
 ]
 
 edge_types = [
     ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
-    ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION,
+
 ]
 
 edge_fields = [
