@@ -34,8 +34,9 @@ import pypath.share.curl as curl
 
 import re
 import pandas as pd
+from biocypher._logger import logger
 
-print("running")
+
 
 def irefindex_interactions():
 
@@ -60,6 +61,7 @@ def irefindex_interactions():
             'organism'
         ),
     )
+    logger.info("Download and process interactions")
 
     #organism = str(organism)
     interactions = []
@@ -73,6 +75,7 @@ def irefindex_interactions():
     for l in f:
         l = l.split('\t')
 
+        
         # PARTNER_A : finalReference A 
         input_partner_a = l[38]
         parts = input_partner_a.split(":") # Splitting the string at ":"
@@ -129,10 +132,12 @@ def irefindex_interactions():
         
         )
     
+
         refc.extend(pmid)
 
     refc = collections.Counter(refc)
-
+    logger.info("Get information from IRefIndex database: partner_a, partner_b, pumed_ids and organism")
+    #logger.info(interactions)
     #print(interactions)
 
 # Call the irefindex_interactions function

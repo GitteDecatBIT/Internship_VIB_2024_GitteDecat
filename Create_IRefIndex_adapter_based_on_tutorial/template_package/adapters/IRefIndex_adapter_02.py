@@ -5,49 +5,53 @@ from itertools import chain
 from typing import Optional
 from biocypher._logger import logger
 
+
+# extra from CROssBAR
+from contextlib import ExitStack
+from time import time
+from template_package.adapters.CROssBAR_IRefIndex_input import irefindex_interactions,irefindex_species
+from template_package.adapters.CROssBAR_IRefIndex_pypath_url import url as irefindex_url
+from pypath.share import curl, settings
+import re
+from typing import Union
+#############################################################################################################
+
+
 logger.debug(f"Loading module {__name__}.")
 
 
-class ExampleAdapterNodeType(Enum):
+
+class IRefIndexAdapterNodeType(Enum):
     """
     Define types of nodes the adapter can provide.
     """
 
     PROTEIN = auto()
-    DISEASE = auto()
+    
 
 
-class ExampleAdapterProteinField(Enum):
+class IRefIndexAdapterProteinField(Enum):
     """
     Define possible fields the adapter can provide for proteins.
     """
 
     ID = "id"
-    SEQUENCE = "sequence"
-    DESCRIPTION = "description"
+    SEQUENCE = "sequence" # dont have a sequence in irefindex ?
+    DESCRIPTION = "description" # same as method?? 
     TAXON = "taxon"
 
 
-class ExampleAdapterDiseaseField(Enum):
-    """
-    Define possible fields the adapter can provide for diseases.
-    """
 
-    ID = "id"
-    NAME = "name"
-    DESCRIPTION = "description"
-
-
-class ExampleAdapterEdgeType(Enum):
+class IRefIndexAdapterEdgeType(Enum):
     """
     Enum for the types of the protein adapter.
     """
 
     PROTEIN_PROTEIN_INTERACTION = "protein_protein_interaction"
-    PROTEIN_DISEASE_ASSOCIATION = "protein_disease_association"
+    
 
 
-class ExampleAdapterProteinProteinEdgeField(Enum):
+class IRefIndexAdapterProteinProteinEdgeField(Enum):
     """
     Define possible fields the adapter can provide for protein-protein edges.
     """
@@ -56,16 +60,15 @@ class ExampleAdapterProteinProteinEdgeField(Enum):
     INTERACTION_SOURCE = "interaction_source"
 
 
-class ExampleAdapterProteinDiseaseEdgeField(Enum):
-    """
-    Define possible fields the adapter can provide for protein-disease edges.
-    """
 
-    ASSOCIATION_TYPE = "association_type"
-    ASSOCIATION_SOURCE = "association_source"
+class IRefIndexEdgeFields(Enum):
+    SOURCE = "source"
+    PUBMED_IDS = "pmid"
+    METHOD = "method"
 
+    
 
-class ExampleAdapter:
+class IRefIndexAdapter:
     """
     Example BioCypher adapter. Generates nodes and edges for creating a
     knowledge graph.
@@ -76,16 +79,64 @@ class ExampleAdapter:
         edge_types: List of edge types to include in the result.
         edge_fields: List of edge fields to include in the result.
     """
-
+    
     def __init__(
         self,
-        node_types: ExampleAdapterNodeType.PROTEIN,
-        node_fields: Optional[list] = None,
-        edge_types: Optional[list] = None,
-        edge_fields: Optional[list] = None,
+        node_types: IRefIndexAdapterNodeType.PROTEIN,
+        node_fields: IRefIndexAdapterProteinField,
+        edge_types: IRefIndexAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
+        edge_fields: Union[None, list[IRefIndexEdgeFields]] = None,
+        test_mode = False, # change to false if you want the intire dataset
+        organism= irefindex_species,
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
+        self.test_mode = test_mode
+        self.organism = organism
+        logger.info(organism)
 
+
+ 
+
+    def download_irefindex_data(self):
+        
+        """
+        Wrapper function to download IRefIndex data using pypath; used to access
+        settings.
+            
+        To do: Make arguments of irefindex_all_interactions selectable for user. 
+        
+        """
+
+        t0 = time()
+        logger.info("Download IRefIndex data")
+
+        with ExitStack() as stack:   
+            stack.enter_context(settings.context(retries=self.retries))
+            
+            if self.debug:                
+                stack.enter_context(curl.debug_on())
+            if not self.cache:
+                stack.enter_context(curl.cache_off())
+
+            if self.organism is None:
+                species =irefindex_species()
+                self.tax_ids = list(species.keys())
+            else:
+                self.tax_ids = [self.organism]                      
+            # download irefindex data
+            self.irefindex_ints = irefindex_interactions()
+
+
+            logger.info(f"This is the link of IRefIndex data we downloaded:{irefindex_url}. Please check if it is up to date")    
+            logger.debug("Started downloading IRefIndex data")
+
+           
+                    
+
+        t1 = time()
+        logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
+
+            
     def get_nodes(self):
         """
         Returns a generator of node tuples for node types specified in the
@@ -96,19 +147,16 @@ class ExampleAdapter:
 
         self.nodes = []
 
-        if ExampleAdapterNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields)) for _ in range(100)]
+        if IRefIndexAdapterNodeType.PROTEIN in self.node_types:
+            [self.nodes.append(Protein(fields=self.node_fields))for _ in range(100)]
 
-        if ExampleAdapterNodeType.DISEASE in self.node_types:
-            [self.nodes.append(Disease(fields=self.node_fields)) for _ in range(100)]
+        #if ExampleAdapterNodeType.DISEASE in self.node_types:
+         #   [self.nodes.append(Disease(fields=self.node_fields)) for _ in range(100)]
 
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
-    
 
-
-
-    def get_edges(self, probability: float = 0.3):
+    def get_edges(self, probability: float = 0.5):
         """
         Returns a generator of edge tuples for edge types specified in the
         adapter constructor.
@@ -136,16 +184,10 @@ class ExampleAdapter:
                 # determine type of edge from other_node type
                 if (
                     isinstance(other_node, Protein)
-                    and ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION
+                    and IRefIndexAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION
                     in self.edge_types
                 ):
-                    edge_type = ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION.value
-                elif (
-                    isinstance(other_node, Disease)
-                    and ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION
-                    in self.edge_types
-                ):
-                    edge_type = ExampleAdapterEdgeType.PROTEIN_DISEASE_ASSOCIATION.value
+                    edge_type = IRefIndexAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION.value
                 else:
                     continue
 
@@ -154,10 +196,10 @@ class ExampleAdapter:
                     node.get_id(),
                     other_node.get_id(),
                     edge_type,
-                    {"example_property": "example_value"},
+                    {"example_property": "example_value"}, #### ????
                 )
 
-    def get_node_count(self):
+
         """
         Returns the number of nodes generated by the adapter.
         """
@@ -167,7 +209,7 @@ class ExampleAdapter:
         if node_types:
             self.node_types = node_types
         else:
-            self.node_types = [type for type in ExampleAdapterNodeType]
+            self.node_types = [type for type in IRefIndexAdapterNodeType]
 
         if node_fields:
             self.node_fields = node_fields
@@ -175,15 +217,15 @@ class ExampleAdapter:
             self.node_fields = [
                 field
                 for field in chain(
-                    ExampleAdapterProteinField,
-                    ExampleAdapterDiseaseField,
+                    IRefIndexAdapterProteinField,
+        
                 )
             ]
 
         if edge_types:
             self.edge_types = edge_types
         else:
-            self.edge_types = [type for type in ExampleAdapterEdgeType]
+            self.edge_types = [type for type in IRefIndexAdapterEdgeType]
 
         if edge_fields:
             self.edge_fields = edge_fields
@@ -247,7 +289,7 @@ class Protein(Node):
         ## random amino acid sequence
         if (
             self.fields is not None
-            and ExampleAdapterProteinField.SEQUENCE in self.fields
+            and IRefIndexAdapterProteinField.SEQUENCE in self.fields
         ):
             # random int between 50 and 250
             l = random.randint(50, 250)
@@ -259,54 +301,14 @@ class Protein(Node):
         ## random description
         if (
             self.fields is not None
-            and ExampleAdapterProteinField.DESCRIPTION in self.fields
+            and IRefIndexAdapterProteinField.DESCRIPTION in self.fields
         ):
             properties["description"] = " ".join(
                 [random.choice(string.ascii_lowercase) for _ in range(10)],
             )
 
         ## taxon
-        if self.fields is not None and ExampleAdapterProteinField.TAXON in self.fields:
-            properties["taxon"] = "9606"
-
-        return properties
-
-
-class Disease(Node):
-    """
-    Generates instances of diseases.
-    """
-
-    def __init__(self, fields: Optional[list] = None):
-        self.fields = fields
-        self.id = self._generate_id()
-        self.label = "do_disease"
-        self.properties = self._generate_properties()
-
-    def _generate_id(self):
-        """
-        Generate a random disease id.
-        """
-        nums = [random.choice(string.digits) for _ in range(8)]
-
-        return f"DOID:{''.join(nums)}"
-
-    def _generate_properties(self):
-        properties = {}
-
-        ## random name
-        if self.fields is not None and ExampleAdapterDiseaseField.NAME in self.fields:
-            properties["name"] = " ".join(
-                [random.choice(string.ascii_lowercase) for _ in range(10)],
-            )
-
-        ## random description
-        if (
-            self.fields is not None
-            and ExampleAdapterDiseaseField.DESCRIPTION in self.fields
-        ):
-            properties["description"] = " ".join(
-                [random.choice(string.ascii_lowercase) for _ in range(10)],
-            )
+        if self.fields is not None and IRefIndexAdapterProteinField.TAXON in self.fields:
+            properties["taxon"] = irefindex_species
 
         return properties
