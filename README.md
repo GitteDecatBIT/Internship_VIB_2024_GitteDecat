@@ -1,31 +1,36 @@
 # Internship_VIB_2024_GitteDecat
-Have to install poetry ro be able to install biocypher 
+
+In this github repository you can find all the scripts that are made during my traineeship by VIB at Zwijnaarde.
+
+The purpose of my traineeship is to create an adapter file for the IRefIndex database to be able to create a knowledge graph using biocypher.  
+
+## Biocypher: 
+
+BioCypher is the simplest way to create an AI-enabled knowledge graph for biomedical (or other) tasks. Knowledge graphs (KGs) are an approach to knowledge representation that uses graph structure to facilitate exploration and analysis of complex data.
+
+website: https://biocypher.org/contents.html 
+
+## Installation:
+
+Install pipx:
+sudo dnf install pipx
+
+Install poetry: 
 pipx install poetry
 
+Install biocypher: 
+poerty add biocypher 
 
-poetry new [name_of_project]
-cd [name_of_project]
-poetry add biocypher
+Install the dependencies using Poetry. 
+poetry install 
 
-Poetry creates a virtual environment for you
-
-install pypath-omnipath--> cause pypath was not recognised 
-
-poetry add pypath-omnipath
-
-same for bioregistry  
-poetry add bioregistry 
-
-
-Do it with the Crossbar github link
-
-git clone link
-cd folder that was created 
-peotry install
+Activate environment that poetry create:
 poetry shell 
-peotry run python file (knowledge graph)
 
-when running it --> it keeps going for a long time at the update_process part
-^CTraceback (most recent call last):
-  File "/home/guest/.cache/pypoetry/virtualenvs/bccb-FmSLJcNW-py3.11/lib/python3.11/site-packages/pypath/share/curl.py", line 1548, in update_progress
-    def update_progress(self, download_total, downloaded, upload_total,
+
+Usage: 
+run the python script that will create the knowledge graph 
+python create_knowledge_graph.py
+
+Output: 
+??
