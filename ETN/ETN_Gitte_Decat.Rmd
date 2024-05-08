@@ -205,15 +205,31 @@ Updated ETN for the last few days
 I uploaded everything to github so that all the information is there for the first time we had to submit the TDP/ETN
 
 ##### Creating adapter file for IRefIndex\
+I tried figuring out how to map the refseq accession number to the uniprot id (using biogrid as a example)
+github:Internship_VIB_2024_GitteDecat/Biocypher_IRefIndex
+
 
 ### Week 3
 
 #### Monday 06/05/2024
 ##### Create adapter file based on biocypher tutorial\
-I tried creating the adapter file based on the tutorial from biocypher to have a script that works. I i try to run the adapter file based on the Crossbar files it does not work. therefore i went back to an more easier example to take as a base. 
+I tried creating the adapter file based on the tutorial from biocypher, to have a script that works. I try to run the adapter file based on the Crossbar files --> it does not work. Therefore i went back to an more easier example to take as a base. 
 i added some parts from the crossbar based file to make it more specific for IRefIndex 
 ##### Updated ETN\ 
 Updated ETN for the this day 
 
+#### Tuesday 07/05/2024
+##### Create adapter file based on biocypher tutorial\
+I tried including the input from the IRefIndex database. With the structure of the tutorial it is possible to run the scripts and create output. but the output does not overlap with the input from irefindex. In the tutorial they just take random ids, labels and so on... this needs to be adjusted for the irefindex input. 
+i also added some logger functions to make it clear for myself what happens as what time. 
+
+#### Wednesday 08/05/2024
+##### Create adapter file based on biocypher tutorial\
+I was able to include the input from the IRefIndex database. With the structure of the tutorial it is possible to run the scripts and create output. 
+
+##### Updated ETN\ 
+Updated ETN for the tuesday and wednesday 
+
 
 ## Problems 
+???

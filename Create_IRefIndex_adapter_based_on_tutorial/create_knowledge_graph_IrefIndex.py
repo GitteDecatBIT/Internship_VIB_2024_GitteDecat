@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from biocypher import BioCypher, Resource
-from template_package.adapters.IRefIndex_adapter_02 import (
+from template_package.adapters.IRefIndex_adapter_03 import (
     IRefIndexAdapter,
     IRefIndexAdapterNodeType,
     IRefIndexAdapterEdgeType,
-    IRefIndexAdapterProteinField,
-    IRefIndexEdgeFields,
+    IRefIndexAdapterProteinNodeField,
+    IRefIndexAdapterProteinProteinEdgeField,  
 )
 
 
@@ -27,7 +27,7 @@ bc = BioCypher()
 
 
 # Download and cache resources (change the directory in the options if needed)
-urls = "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
+#urls = "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
 
 # resource must be specified 
 resource = Resource(
@@ -36,8 +36,7 @@ resource = Resource(
     lifetime=7,  # seven days cache lifetime
 )
 
-logger.info("url;{}".format(urls))
-logger.info(resource.url_s)
+
 
 paths = bc.download(resource)  # Downloads to '.cache' by default
 logger.info("path: {}" .format(paths))
@@ -53,10 +52,8 @@ node_types = [
 # These are defined in the adapter (`adapter.py`).
 node_fields = [
     # Proteins
-    IRefIndexAdapterProteinField.ID,
-    IRefIndexAdapterProteinField.SEQUENCE,
-    IRefIndexAdapterProteinField.DESCRIPTION,
-    IRefIndexAdapterProteinField.TAXON, 
+    IRefIndexAdapterProteinNodeField.PUBMED_ID,
+    IRefIndexAdapterProteinNodeField.TAXON, 
 ]
 
 edge_types = [
@@ -65,9 +62,9 @@ edge_types = [
 ]
 
 edge_fields = [
-    IRefIndexEdgeFields.SOURCE,
-    IRefIndexEdgeFields.PUBMED_IDS,
-    IRefIndexEdgeFields.METHOD,
+    IRefIndexAdapterProteinProteinEdgeField.INTERACTION_TYPE,
+    IRefIndexAdapterProteinProteinEdgeField.INTERACTION_SOURCE,
+    IRefIndexAdapterProteinProteinEdgeField.METHOD,
 ]
 
 # Create a protein adapter instance

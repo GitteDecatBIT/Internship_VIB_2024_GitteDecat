@@ -116,7 +116,7 @@ def irefindex_species() -> dict[int,str]:
 
             return organism 
 
-"""
+
 def irefindex_partner_a():
     partner_a= {}
     url = irefindex_url.get("irefindex").get("url")
@@ -136,7 +136,7 @@ def irefindex_partner_a():
             partner_a = ""
         #print("partner_a: {}".format(partner_a))
 
-    return partner_a
+        return partner_a
 
 
 def irefindex_partner_b():
@@ -156,7 +156,7 @@ def irefindex_partner_b():
         else:   
             partner_b = ""  
         #print("partner_b: {}".format(partner_b))    
-    return partner_b
+            return partner_b
   
 def irefindex_pmids():
     pmid= {}
@@ -174,7 +174,7 @@ def irefindex_pmids():
         pmid = re.findall(pattern_pmid, input_pmid)
         #print("pmid: {}".format(pmid))
 
-    return pmid
+        return pmid
 
 
 def irefindex_method():
@@ -195,6 +195,5 @@ def irefindex_method():
         else:
             method = ""
         #print("method: {}".format(method))
-    return method 
+        return method 
 
-"""

@@ -31,17 +31,15 @@ class IRefIndexAdapterNodeType(Enum):
     
 
 
-class IRefIndexAdapterProteinField(Enum):
+class IRefIndexAdapterProteinNodeField(Enum):
     """
     Define possible fields the adapter can provide for proteins.
     """
 
-    ID = "id"
-    SEQUENCE = "sequence" # dont have a sequence in irefindex ?
-    DESCRIPTION = "description" # same as method?? 
+    PUBMED_ID = "pmid"
     TAXON = "taxon"
-
-
+    #SOURCE = "source"
+    
 
 class IRefIndexAdapterEdgeType(Enum):
     """
@@ -57,15 +55,11 @@ class IRefIndexAdapterProteinProteinEdgeField(Enum):
     Define possible fields the adapter can provide for protein-protein edges.
     """
 
-    INTERACTION_TYPE = "interaction_type"
-    INTERACTION_SOURCE = "interaction_source"
-
-
-
-class IRefIndexEdgeFields(Enum):
-    SOURCE = "source"
-    PUBMED_IDS = "pmid"
+    INTERACTION_TYPE = "interaction_type" # column [11]
+    INTERACTION_SOURCE = "interaction_source" # column [12]
     METHOD = "method"
+
+    
 
     
 
@@ -83,55 +77,13 @@ class IRefIndexAdapter:
     
     def __init__(
         self,
-        node_types: IRefIndexAdapterNodeType.PROTEIN,
-        node_fields: IRefIndexAdapterProteinField,
-        edge_types: IRefIndexAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
-        edge_fields: Union[None, list[IRefIndexEdgeFields]] = None,
-        organism= irefindex_species,
+        node_types: Union[None, list[IRefIndexAdapterNodeType]] = None,
+        node_fields:Union[None, list[IRefIndexAdapterProteinNodeField]] = None,
+        edge_types: Union[None, list[IRefIndexAdapterEdgeType]] = None,
+        edge_fields:Union[None, list[IRefIndexAdapterProteinProteinEdgeField]] = None,
+        
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
-        self.organism = organism
-        logger.info(organism)
-
-    def download_irefindex_data(self):
-        
-        """
-        Wrapper function to download IRefIndex data using pypath; used to access
-        settings.
-            
-        To do: Make arguments of irefindex_all_interactions selectable for user. 
-        
-        """
-
-        t0 = time()
-
-        with ExitStack() as stack:                         
-            stack.enter_context(settings.context(retries=self.retries))
-            
-            if self.debug:                
-                stack.enter_context(curl.debug_on())
-            if not self.cache:
-                stack.enter_context(curl.cache_off())
-
-            if self.organism is None:
-                species =irefindex_species()
-                self.tax_ids = list(species.keys())
-            else:
-                self.tax_ids = [self.organism]
-
-            # download irefindex data
-            self.irefindex_ints = irefindex_interactions()
-
-        
-
-            logger.info(f"This is the link of IRefIndex data we downloaded:{irefindex_url}. Please check if it is up to date")    
-            logger.debug("Started downloading IRefIndex data")
-
-            
-            
-
-        t1 = time()
-        logger.info(f'IRefIndex data is downloaded in {round((t1-t0) / 60, 2)} mins')
 
 
 
@@ -151,6 +103,9 @@ class IRefIndexAdapter:
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
 
+
+    # duplicates are found!!!! see CRosBAR file for this 
+            
     def get_edges(self, probability: float = 0.5):
         """
         Returns a generator of edge tuples for edge types specified in the
@@ -212,7 +167,7 @@ class IRefIndexAdapter:
             self.node_fields = [
                 field
                 for field in chain(
-                    IRefIndexAdapterProteinField,
+                    IRefIndexAdapterProteinNodeField,
         
                 )
             ]
@@ -225,7 +180,13 @@ class IRefIndexAdapter:
         if edge_fields:
             self.edge_fields = edge_fields
         else:
-            self.edge_fields = [field for field in chain()]
+            self.edge_fields = [
+                field 
+                for field in chain(
+                IRefIndexAdapterProteinProteinEdgeField,
+                )
+            ]
+
 
 
 class Node:
@@ -255,55 +216,53 @@ class Node:
         Returns the node properties.
         """
         return self.properties
-
 ## specify what is uploaded to the exel 
     #:ID, sequence, description, taxon, id, preferred id (comes from schema_config.yaml), :LABEL
 
-from template_package.adapters.CROssBAR_IRefIndex_pypath_url import url as irefindex_url
 
 class Protein(Node):
     """
     Generates instances of proteins.
     """
 
-    def __init__(self, fields: Union[None, list[IRefIndexAdapterProteinField]] = None):
+    def __init__(self, fields: Union[None, list[IRefIndexAdapterProteinNodeField]] = None):
         self.fields = fields
         self.id = self._get_id()
         self.label = "uniprot_protein"
         self.properties = self._get_properties()
 
+
+    # ?????
+    # id is a function and join function does not work in biocypher _batch_writer.py on line 643
+        # lines.append(self.delim.join(line) + "\n")
+        #line = [n.get_id()]
+        #_id = node.get_id()
+
     def _get_id(self):
         """
         Get uniprot id.
         """
-        id_partner_a= irefindex_partner_a
-        id_partner_b = irefindex_partner_b
+        id_partner_a= irefindex_partner_a()
+        
 
-        return id_partner_a, id_partner_b
+        return id_partner_a
 
 
     def _get_properties(self):
         properties = {}
 
-        ## random description
-        if (
-            self.fields is not None
-            and IRefIndexAdapterProteinField.DESCRIPTION in self.fields
-        ):
-            properties["method"] = irefindex_method       
-            # METHOD
-        input_method= l[6]
-        pattern_method= r'\((.*?)\)'
-        match_method= re.search(pattern_method, input_method)
-        if match_method:
-            method = match_method.group(1) # Extracting the text between brackets
-        else:
-            method = ""
-        #print("method: {}".format(method))
+        ## pmid
+        if self.fields is not None and IRefIndexAdapterProteinNodeField.TAXON in self.fields:
+            properties["pmid"] = irefindex_pmids()
+        
+        ## method
+        #if self.fields is not None and IRefIndexAdapterProteinField.TAXON in self.fields:
+        #    properties["method"] = irefindex_method
+        
+        ## organism(taxon)
+        if self.fields is not None and IRefIndexAdapterProteinNodeField.TAXON in self.fields:
+            properties["taxon"] = irefindex_species()
 
-
-        ## taxon
-        if self.fields is not None and IRefIndexAdapterProteinField.TAXON in self.fields:
-            properties["taxon"] = irefindex_species
-
+        ## source ??
+            
         return properties
