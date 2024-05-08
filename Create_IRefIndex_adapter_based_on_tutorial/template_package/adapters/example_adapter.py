@@ -79,7 +79,7 @@ class ExampleAdapter:
 
     def __init__(
         self,
-        node_types: ExampleAdapterNodeType.PROTEIN,
+        node_types: Optional[list] = None,
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,

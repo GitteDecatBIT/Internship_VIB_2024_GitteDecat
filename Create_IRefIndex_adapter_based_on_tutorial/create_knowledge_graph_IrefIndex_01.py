@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 from biocypher import BioCypher, Resource
-from template_package.adapters.IRefIndex_adapter_02 import (
-    IRefIndexAdapter,
-    IRefIndexAdapterNodeType,
-    IRefIndexAdapterEdgeType,
-    IRefIndexAdapterProteinField,
+from template_package.adapters.IRefIndex_adapter_01 import (
+    ExampleAdapter,
+    ExampleAdapterNodeType,
+    ExampleAdapterEdgeType,
+    ExampleAdapterProteinField,
     IRefIndexEdgeFields,
 )
 
@@ -18,7 +18,6 @@ from pypath.share import curl, settings
 import re
 from typing import Union
 from biocypher._logger import logger
-import collections
 
 # Instantiate the BioCypher interface
 # You can use `config/biocypher_config.yaml` to configure the framework or
@@ -27,17 +26,16 @@ bc = BioCypher()
 
 
 # Download and cache resources (change the directory in the options if needed)
-urls = "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
+#urls = "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
 
 # resource must be specified 
 resource = Resource(
     name="IRefIndex",  # Name of the resource
-    url_s=irefindex_interactions(),  # URL to the resource(s)
+    url_s=irefindex_interactions,  # URL to the resource(s)
     lifetime=7,  # seven days cache lifetime
 )
 
-logger.info("url;{}".format(urls))
-logger.info(resource.url_s)
+
 
 paths = bc.download(resource)  # Downloads to '.cache' by default
 logger.info("path: {}" .format(paths))
@@ -46,21 +44,21 @@ logger.info("path: {}" .format(paths))
 # Choose node types to include in the knowledge graph.
 # These are defined in the adapter (`adapter.py`).
 node_types = [
-    IRefIndexAdapterNodeType.PROTEIN,
+    ExampleAdapterNodeType.PROTEIN,
 ]
 
 # Choose protein adapter fields to include in the knowledge graph.
 # These are defined in the adapter (`adapter.py`).
 node_fields = [
     # Proteins
-    IRefIndexAdapterProteinField.ID,
-    IRefIndexAdapterProteinField.SEQUENCE,
-    IRefIndexAdapterProteinField.DESCRIPTION,
-    IRefIndexAdapterProteinField.TAXON, 
+    ExampleAdapterProteinField.ID,
+    ExampleAdapterProteinField.SEQUENCE,
+    ExampleAdapterProteinField.DESCRIPTION,
+    ExampleAdapterProteinField.TAXON, 
 ]
 
 edge_types = [
-    IRefIndexAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
+    ExampleAdapterEdgeType.PROTEIN_PROTEIN_INTERACTION,
 
 ]
 
@@ -71,7 +69,7 @@ edge_fields = [
 ]
 
 # Create a protein adapter instance
-adapter = IRefIndexAdapter(
+adapter = ExampleAdapter(
     node_types=node_types,
     node_fields=node_fields,
     edge_types=edge_types,
