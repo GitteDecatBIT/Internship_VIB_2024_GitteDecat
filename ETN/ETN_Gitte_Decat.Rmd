@@ -19,7 +19,7 @@ Student: Gitte Decat 		Traineeship supervisor: Alexander Botzki
 -----------------------------------------------------------------------------------------------------------------------------
 Tentative planning: 
 During this traineeship I will work with Biocypher. Biocypher is created to retrieve information about certain interactions and create a knowledge graph. You can retrieve information about  gene-gene interactions, protein-protein interactions, gene-disease interactions, metabolic interactions and biological processes. With this information biocypher will create a visual representation of the complexes. 
-To ben able to create a knowledge graph you need results from a database. Biocypher uses a collection of reusable “adapters” for different sources of biomedical knowledge. Due to the use of adapters a reproducible knowledge graph  can be created and shared for every specific task. 
+To be able to create a knowledge graph you need results from a database. Biocypher uses a collection of reusable “adapters” for different sources of biomedical knowledge. Due to the use of adapters a reproducible knowledge graph  can be created and shared for every specific task. 
 VIB works with the database IRefIndex and would like to be able to use biocypher to create a knowledge graph. The problem is that there is not a adapter available for the IRefIndex database. In this adapter has to be defined where you can find specific information and what has to happen with that information. In particular they want to get information about the protein-protein interactions when creating the knowledge graph. 
 These tasks will be performed during the traineeship from 22/04/2024 till 14/06/2024.
 Data management 
@@ -226,9 +226,90 @@ i also added some logger functions to make it clear for myself what happens as w
 #### Wednesday 08/05/2024
 ##### Create adapter file based on biocypher tutorial\
 I was able to include the input from the IRefIndex database. With the structure of the tutorial it is possible to run the scripts and create output. 
+this is the output: 2024-05-08 16:59:55,013	INFO	module:_logger
+This is BioCypher v0.5.37.
+2024-05-08 16:59:55,013	INFO	module:_logger
+Logging into `biocypher-log/biocypher-20240508-165955.log`.
+2024-05-08 16:59:56,445	INFO	module:CROssBAR_IRefIndex_input
+Running input script for IRefIndex
+2024-05-08 16:59:56,446	INFO	module:CROssBAR_IRefIndex_input
+Downloading interations from IRefIndex
+2024-05-08 17:00:02,727	INFO	module:CROssBAR_IRefIndex_input
+Getting information for the IRefIndex database: partner_a, partner_b, pumed_ids, method and organism
+2024-05-08 17:00:02,837	INFO	module:_get
+Loading cache file .cache/cache.json.
+2024-05-08 17:00:02,838	INFO	module:_get
+Use cached version from .cache/IRefIndex.
+2024-05-08 17:00:02,839	INFO	module:create_knowledge_graph_IrefIndex
+path: ['.cache/IRefIndex/7227.mitab.08-28-2023.txt.zip', '.cache/IRefIndex/7227.mitab.08-28-2023.txt.zip.unzip']
+2024-05-08 17:00:02,842	INFO	module:_ontology
+Loading ontologies...
+2024-05-08 17:00:02,843	INFO	module:_ontology
+Instantiating OntologyAdapter class for https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl.
+2024-05-08 17:00:07,541	INFO	module:_write
+Creating output directory `/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240508170002`.
+2024-05-08 17:00:07,541	INFO	module:IRefIndex_adapter_03
+Generating nodes.
+2024-05-08 17:00:08,124	WARNING	module:_deduplicate
+Duplicate node type protein found. 
+2024-05-08 17:00:08,126	INFO	module:_write
+Writing 1 entries to Protein-part000.csv
+2024-05-08 17:00:08,126	INFO	module:IRefIndex_adapter_03
+Generating edges.
+2024-05-08 17:00:08,127	INFO	module:IRefIndex_adapter_03
+Generating nodes.
+2024-05-08 17:00:08,868	INFO	module:_write
+Writing 49 entries to ProteinInteraction-part000.csv
+2024-05-08 17:00:08,869	INFO	module:_write
+Writing neo4j import call to `/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240508170002/neo4j-admin-import-call.sh`.
+2024-05-08 17:00:08,869	INFO	module:_ontology
+Showing ontology structure based on https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
+2024-05-08 17:00:08,870	WARNING	module:_misc
+The ontology contains multiple inheritance (one child node has multiple parent nodes). This is not visualized in the following hierarchy tree (the child node is only added once). If you want to browse all relationships of the parsed ontology write a graphml file to disk and view this file.
+2024-05-08 17:00:08,870	INFO	module:_ontology
+
+entity
+├── association
+│   ├── gene to gene association
+│   │   └── pairwise gene to gene interaction
+│   │       └── pairwise molecular interaction
+│   │           └── protein interaction
+│   └── protein to disease association
+└── named thing
+    └── biological entity
+        ├── disease or phenotypic feature
+        │   └── disease
+        └── polypeptide
+            └── protein
+
+2024-05-08 17:00:08,870	INFO	module:_core
+Duplicate node types encountered (IDs in log): 
+    protein
+
+2024-05-08 17:00:08,870	INFO	module:_core
+No duplicate edges in input.
+2024-05-08 17:00:08,870	INFO	module:_core
+No missing labels in input.
+
+problems: 
+- only takes 1 id ( first one)
+- duplicates ar found 
+- still takes random relationship id --> generating edges ( id column in protein-interaction file )
+- second node id is not the right one yet 
+- label column in protein -part000.csv -> dont know where this comes from 
+- example property column in protein interaction file --> dont know what this needs to be / or that it needs to be included 
+- 
 
 ##### Updated ETN\ 
 Updated ETN for the tuesday and wednesday 
+
+#### Thusday 09/05/2024
+##### Ascension\
+Free day 
+
+#### Friday 10/05/2024\
+##### Create adapter file based on biocypher tutorial\
+Changed the way the data is downloaded in the adapter file. Use the url in the resource for downloading the data and parse the data in the adapter file other de def get_nodes.
 
 
 ## Problems 

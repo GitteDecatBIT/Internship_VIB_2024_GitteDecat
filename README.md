@@ -12,25 +12,28 @@ website: https://biocypher.org/contents.html
 
 ## Installation:
 
-Install pipx:
-sudo dnf install pipx
+Install pipx:\
+sudo dnf install pipx --> andere optie 
 
-Install poetry: 
+Install poetry: \
 pipx install poetry
 
-Install biocypher: 
+Clone the github repository:\
+git clone git@github.com:GitteDecatBIT/Internship_VIB_2024_GitteDecat.git
+cd Internship_VIB_2024_GitteDecat
+
+Install biocypher: \
 poerty add biocypher 
 
-Install the dependencies using Poetry. 
+Install the dependencies using Poetry: \
 poetry install 
 
-Activate environment that poetry create:
+Activate environment that poetry create:\
 poetry shell 
-
 
 Usage: 
 run the python script that will create the knowledge graph 
-python create_knowledge_graph.py
+python create_knowledge_graph_IrefIndex.py
 
 Output: 
 ??

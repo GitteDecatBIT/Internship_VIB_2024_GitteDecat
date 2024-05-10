@@ -30,6 +30,7 @@ def irefindex_interactions():
     c = curl.Curl(url, silent = False, large = True, slow = True)
     f = next(iter(c.result.values()))
     nul = f.readline()
+    #logger.info(nul)
 
     for l in f:
         l = l.split('\t')
@@ -89,8 +90,11 @@ def irefindex_interactions():
             )
         
         )
+    return interactions
 
-    logger.info("Getting information for the IRefIndex database: partner_a, partner_b, pumed_ids, method and organism")
+
+
+logger.info("Getting information for the IRefIndex database: partner_a, partner_b, pumed_ids, method and organism")
 
 
 
@@ -114,7 +118,7 @@ def irefindex_species() -> dict[int,str]:
             else:
                 organism = ""
 
-            return organism 
+    return organism 
 
 
 def irefindex_partner_a():
@@ -122,7 +126,7 @@ def irefindex_partner_a():
     url = irefindex_url.get("irefindex").get("url")
     c = curl.Curl(url, silent = False, large = True, slow = True)
     f = next(iter(c.result.values()))
-    nul = f.readline()
+    nul = f.readline() # headers of the file
 
 
     for l in f:
@@ -136,7 +140,7 @@ def irefindex_partner_a():
             partner_a = ""
         #print("partner_a: {}".format(partner_a))
 
-        return partner_a
+    return partner_a
 
 
 def irefindex_partner_b():
@@ -156,7 +160,7 @@ def irefindex_partner_b():
         else:   
             partner_b = ""  
         #print("partner_b: {}".format(partner_b))    
-            return partner_b
+    return partner_b
   
 def irefindex_pmids():
     pmid= {}
@@ -174,7 +178,7 @@ def irefindex_pmids():
         pmid = re.findall(pattern_pmid, input_pmid)
         #print("pmid: {}".format(pmid))
 
-        return pmid
+    return pmid
 
 
 def irefindex_method():
@@ -195,5 +199,5 @@ def irefindex_method():
         else:
             method = ""
         #print("method: {}".format(method))
-        return method 
+    return method 
 

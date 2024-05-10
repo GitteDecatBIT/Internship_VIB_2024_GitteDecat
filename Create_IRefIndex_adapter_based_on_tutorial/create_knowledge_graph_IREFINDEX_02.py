@@ -20,6 +20,7 @@ bc = BioCypher()
 # Download and cache resources (change the directory in the options if needed)
 urls = "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
 logger.info("url:{}".format(urls))
+
 # resource must be specified 
 resource = Resource(
     name="IRefIndex",  # Name of the resource
@@ -32,7 +33,6 @@ logger.info("Resource: {}" .format(resource))
 
 
 paths = bc.download(resource)  # Downloads to '.cache' by default
-
 logger.info("Downloaded data from path: {}" .format(paths))
 # You can use the list of paths returned to read the resource into your adapter
 

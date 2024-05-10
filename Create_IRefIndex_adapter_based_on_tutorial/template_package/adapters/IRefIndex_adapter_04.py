@@ -10,11 +10,13 @@ from biocypher._logger import logger
 # extra from CROssBAR
 from contextlib import ExitStack
 from time import time
-from template_package.adapters.CROssBAR_IRefIndex_input import irefindex_interactions,irefindex_species ,irefindex_partner_a,irefindex_partner_b,irefindex_method,irefindex_pmids
 from template_package.adapters.CROssBAR_IRefIndex_pypath_url import url as irefindex_url
 from pypath.share import curl, settings
 import re
 from typing import Union
+#from create_knowledge_graph_IrefIndex import paths
+import os 
+import collections
 #############################################################################################################
 
 
@@ -81,20 +83,20 @@ class IRefIndexAdapter:
         node_fields:Union[None, list[IRefIndexAdapterProteinNodeField]] = None,
         edge_types: Union[None, list[IRefIndexAdapterEdgeType]] = None,
         edge_fields:Union[None, list[IRefIndexAdapterProteinProteinEdgeField]] = None,
+        input_dir= None, 
+        #organism= organism, 
         
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
 
-
-
+    # maybe put the parsing in a differen def????
     def get_nodes(self):
         """
         Returns a generator of node tuples for node types specified in the
         adapter constructor.
         """
-
         logger.info("Generating nodes.")
-
+        
         self.nodes = []
 
         if IRefIndexAdapterNodeType.PROTEIN in self.node_types:
@@ -102,6 +104,107 @@ class IRefIndexAdapter:
 
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
+        
+        #https://github.com/biocypher/dependency-map/blob/main/dmb/adapter.py#L342 --> line 312 ( get nodes)
+            
+        # Extracting information from IRefIndex
+        logger.info("Extracting information from IRefIndex")
+        
+        IRefIndexPhysicalInteraction = collections.namedtuple(
+            'IRefIndexPhysicalInteraction',
+            (
+                'partner_a',
+                'partner_b',
+                'pmid', 
+                'method',
+                'organism', 
+            ),
+        )
+
+        logger.info("Created a collection of the variables: IRefIndexPhysicalInteractions")
+
+        # Path to the extracted data directory
+        input_file_dir = '.cache/IRefIndex/7227.mitab.08-28-2023.txt.zip.unzip'
+        logger.info("input file dir: {}" .format(input_file_dir))
+        # Iterate over the files in the extracted directory and parse each file as needed
+        for filename in os.listdir(input_file_dir):
+            if filename.endswith(".txt"):
+                inputfile_path = os.path.join(input_file_dir, filename)
+        
+        logger.info("inputfile:{}".format(inputfile_path))
+
+ 
+        logger.info("Exctracting columns from the IRefIndex database")
+
+        interactions = []
+
+        # Open the file
+        with open(inputfile_path, 'r') as file:
+            logger.info("Getting inforamtion: partner_a, partner_b, pubmed_id, method and organism")
+            for line in file:
+                # Split the line by tab character
+                l = line.split('\t')
+                
+                # PARTNER_A: finalReference A 
+                input_partner_a = l[38]
+                parts = input_partner_a.split(":")
+                partner_a = parts[1] if len(parts) > 1 else ""
+
+                input_partner_a = l[38]
+                parts = input_partner_a.split(":") # Splitting the string at ":"
+                if len(parts) > 1:
+                    partner_a = parts[1] # Selecting the second part after ":"
+                else:
+                    partner_a = ""
+
+                # PARTNER_B: FinalReference B 
+                input_partner_b = l[39]
+                parts = input_partner_b.split(":")
+                if len(parts) > 1:
+                    partner_b = parts[1]  
+                else:
+                    partner_b= ""
+
+                # PUBMED_ID
+                input_pmid = l[8]
+                pattern_pmid = r'\d+'
+                pmid = re.findall(pattern_pmid, input_pmid)
+
+                # METHOD
+                input_method= l[6]
+                pattern_method= r'\((.*?)\)'
+                match_method= re.search(pattern_method, input_method)
+                if match_method:
+                    method = match_method.group(1) # Extracting the text between brackets
+                else:
+                    method = ""
+
+                # ORGANISM
+                input_organism= l[10]
+                pattern_organism= r'taxid:(\d+)'
+                match_organism= re.search(pattern_organism, input_organism)
+                if match_organism:
+                    organism = match_organism.group(1)
+                else:
+                    organism = ""
+
+                interactions.append(
+                    IRefIndexPhysicalInteraction(
+                        partner_a=partner_a,
+                        partner_b=partner_b,
+                        pmid=pmid,
+                        method=method,
+                        organism=organism,
+                    )
+                )
+            #logger.info(interactions)
+        
+            logger.info("Succesfully extracted columns from the IRefIndex database!")
+            return interactions
+           
+        
+
+
 
 
     # duplicates are found!!!! see CRosBAR file for this 
@@ -242,7 +345,7 @@ class Protein(Node):
         """
         Get uniprot id.
         """
-        id_partner_a= irefindex_partner_a()
+        id_partner_a= partner_a
         
 
         return id_partner_a
