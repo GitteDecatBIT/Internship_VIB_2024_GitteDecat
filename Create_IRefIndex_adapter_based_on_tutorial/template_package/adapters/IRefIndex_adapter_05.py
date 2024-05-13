@@ -50,7 +50,7 @@ class IRefIndexAdapter:
     """
     def __init__(self, 
                  output_dir = None, 
-                 export_csv = False, 
+                 export_csvs = False, 
                  split_output = False, 
                  cache=False, 
                  debug=False, 
@@ -68,7 +68,7 @@ class IRefIndexAdapter:
                  rename_selected_fields: Union[None, list[str]] = None,
             
                  ):
-        self.export_csv = export_csv
+        self.export_csvs = export_csvs
         self.swissprots = list(uniprot._all_uniprots("*", True))
         self.irefindex_fields = irefindex_fields
 
@@ -79,7 +79,8 @@ class IRefIndexAdapter:
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
 
 
-        
+# column in process 
+# get nodes --> zie wat er in de nodes dan moet       
     def get_irefindex_data(self):
 
         # Extracting information from IRefIndex
@@ -142,8 +143,19 @@ class IRefIndexAdapter:
 
                 # PUBMED_ID
                 input_pmid = l[8]
-                pattern_pmid = r'\d+'
-                pmid = re.findall(pattern_pmid, input_pmid)
+                # Split the string by '|'
+                parts = input_pmid.split('|')
+                # Take the last part of the split
+                last_part = parts[-1]
+
+                # Split again by '.'
+                numbers = last_part.split('.')
+
+                # Take the last part of this split, which is the number
+                pmid = numbers[-1]
+
+                #pattern_pmid = r'\d+'
+                #pmid = re.findall(pattern_pmid, input_pmid)
 
                 # METHOD
                 input_method= l[6]
@@ -175,6 +187,7 @@ class IRefIndexAdapter:
                 
             logger.info("Succesfully extracted columns from the IRefIndex database!")
             self.irefindex_ints = interactions
+            #logger.info(interactions)
             return interactions
         
     
@@ -190,7 +203,7 @@ class IRefIndexAdapter:
         
         selected_fields = self.set_edge_fields()
             
-        default_field_names = { "pmid":"pubmed_ids", "taxon":"taxon" ,"method":"method"}
+        default_field_names = { "protein":"protein", "pmid":"pubmed_ids", "taxon":"taxon" ,"method":"method"}
         
         self.irefindex_field_new_names = {}
         
@@ -216,13 +229,13 @@ class IRefIndexAdapter:
             self.irefindex_field_new_names["partner_b"] = "uniprot_b"
         
         
-        logger.info("Started processing BioGRID data")
+        logger.info("Started processing IRefIndex data")
         t1 = time()
                          
         # create dataframe          
         irefindex_df = pd.DataFrame.from_records(self.irefindex_ints, columns=self.irefindex_ints[0]._fields)
 
-        logger.info("create irefindex_dataframe:{}".format(irefindex_df)) # --> partner_a     partner_b        pmid method taxon
+        logger.info("create irefindex_dataframe:{}".format(irefindex_df)) # --> partner_a |partner_b |pmid |method |taxon
 
 
         
@@ -230,7 +243,7 @@ class IRefIndexAdapter:
         irefindex_df["source"] = "IRefIndex"
         # filter selected fields
         irefindex_df = irefindex_df[list(self.irefindex_field_new_names.keys())]
-        logger.info("filter irefindex_dataframe:{}".format(irefindex_df)) # --> pmid taxon                          method                    partner_a     partner_b
+        logger.info("filter irefindex_dataframe:{}".format(irefindex_df)) # --> pmid| taxon| method| partner_a |partner_b
         # rename columns
         irefindex_df.rename(columns=self.irefindex_field_new_names, inplace=True)
         logger.info("rename irefindex_dataframe:{}".format(irefindex_df))
@@ -239,16 +252,18 @@ class IRefIndexAdapter:
         # drop rows if uniprot_a or uniprot_b is not a swiss-prot protein
         irefindex_df = irefindex_df[(irefindex_df["uniprot_a"].isin(self.swissprots)) & (irefindex_df["uniprot_b"].isin(self.swissprots))]
         irefindex_df.reset_index(drop=True, inplace=True)
-        logger.info("drop in irefindex_dataframe if not in swissprot :{}".format(irefindex_df)) # --> pubmed_ids taxon                          method                    uniprot_a     uniprot_b
+        logger.info("drop in irefindex_dataframe if not in swissprot :{}".format(irefindex_df)) # --> pubmed_ids | taxon | method |uniprot_a |uniprot_b
 
         
         # drop duplicates if same a x b pair exists multiple times 
         # keep the first pair and collect pubmed ids of duplicated a x b pairs in that pair's pubmed id column
         # if a x b pair has same experimental system type with b x a pair, drop b x a pair
         irefindex_df_unique = irefindex_df.dropna(subset=["uniprot_a", "uniprot_b"]).reset_index(drop=True)        
+        logger.info("unique irefindex_dataframe:{}".format(irefindex_df_unique))
         
         
         def aggregate_fields(element):
+            #logger.info("element:{}".format(element)) # element is pubmed id --> error of list with the 4 one [3]
             element = "|".join([str(e) for e in set(element.dropna())])
             if not element:
                 return np.nan
@@ -280,7 +295,7 @@ class IRefIndexAdapter:
         self.final_irefindex_ints = irefindex_df_unique
         
         t2 = time()
-        logger.info(f'BioGRID data is processed in {round((t2-t1) / 60, 2)} mins')
+        logger.info(f'IRefIndex data is processed in {round((t2-t1) / 60, 2)} mins')
             
     def set_edge_fields(self) -> list:
         """
