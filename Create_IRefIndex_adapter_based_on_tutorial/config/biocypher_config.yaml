@@ -5,6 +5,7 @@ biocypher:
   debug: false
   schema_config_path: config/schema_config.yaml
   cache_directory: .cache
+  url: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
 
 neo4j:
   delimiter: '\t'
