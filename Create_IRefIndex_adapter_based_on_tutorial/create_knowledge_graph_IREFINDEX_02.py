@@ -98,7 +98,6 @@ adapter = IRefIndexAdapter(
 )
 
 
-adapter.get_irefindex_data()
 
 # Create a knowledge graph from the adapter
 bc.write_nodes(adapter.get_nodes())
