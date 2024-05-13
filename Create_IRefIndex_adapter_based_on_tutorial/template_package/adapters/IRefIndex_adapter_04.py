@@ -89,24 +89,10 @@ class IRefIndexAdapter:
     ):
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
 
-    # maybe put the parsing in a differen def????
-    def get_nodes(self):
-        """
-        Returns a generator of node tuples for node types specified in the
-        adapter constructor.
-        """
-        logger.info("Generating nodes.")
-        
-        self.nodes = []
 
-        if IRefIndexAdapterNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields))for _ in range(100)]
-
-        for node in self.nodes:
-            yield (node.get_id(), node.get_label(), node.get_properties())
         
-        #https://github.com/biocypher/dependency-map/blob/main/dmb/adapter.py#L342 --> line 312 ( get nodes)
-            
+    def get_irefindex_data(self):
+
         # Extracting information from IRefIndex
         logger.info("Extracting information from IRefIndex")
         
@@ -197,13 +183,32 @@ class IRefIndexAdapter:
                         organism=organism,
                     )
                 )
-            #logger.info(interactions)
-        
+                
             logger.info("Succesfully extracted columns from the IRefIndex database!")
             return interactions
-           
-        
 
+    # maybe put the parsing in a differen def????
+    def get_nodes(self):
+        """
+        Returns a generator of node tuples for node types specified in the
+        adapter constructor.
+        """
+        logger.info("Generating nodes.")
+        
+        self.nodes = []
+
+        if IRefIndexAdapterNodeType.PROTEIN in self.node_types:
+            [self.nodes.append(Protein(fields=self.node_fields))for _ in range(100)]
+
+
+        for node in self.nodes:
+            yield (node.get_id(), node.get_label(), node.get_properties())
+
+
+        #https://github.com/biocypher/dependency-map/blob/main/dmb/adapter.py#L342 --> line 312 ( get nodes)
+        
+        
+    
 
 
 
@@ -345,7 +350,7 @@ class Protein(Node):
         """
         Get uniprot id.
         """
-        id_partner_a= partner_a
+        id_partner_a= interactions.partner_a
         
 
         return id_partner_a
