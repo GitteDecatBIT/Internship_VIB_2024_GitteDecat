@@ -14,6 +14,7 @@ python = "^3.10"
 biocypher = "^0.5.37"
 pypath = "^0.1"
 pypath-omnipath = "^0.16.10"
+bioregistry = "^0.11.4"
 
 [build-system]
 requires = ["poetry-core"]
