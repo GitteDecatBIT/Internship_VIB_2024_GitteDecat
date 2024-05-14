@@ -73,9 +73,11 @@ class IRefIndexAdapter:
                  edge_fields:Union[None, list[IRefIndexEdgeFields]] = None,
             
                  ):
+        self.output_dir = output_dir
         self.export_csvs = export_csvs
-        self.swissprots = list(uniprot._all_uniprots("*", True))
         self.irefindex_fields = irefindex_fields
+        self.swissprots = list(uniprot._all_uniprots("*", True))
+       
         self.add_prefix = add_prefix
 
         self.aggregate_dict = {IRefIndexEdgeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
@@ -88,7 +90,7 @@ class IRefIndexAdapter:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
             self.output_dir = output_dir
 
-    def export_dataframe(self, dataframe, data_label):
+    def export_dataframe(self,irefindex_df_unique):
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
         # TODO: activate this block after adding n_rows_in_file setting to config file
@@ -98,8 +100,8 @@ class IRefIndexAdapter:
             # for id, chunk in  enumerate(np.array_split(dataframe, n_chunks)):
             #     chunk.to_csv(os.path.join(output_path, f"crossbar_ppi_data_{data_label}_{id+1}.csv"), index=False)
         # else:
-        output_path = os.path.join(self.output_dir, f"crossbar_ppi_data_{data_label}.csv")
-        dataframe.to_csv(output_path, index=False)
+        output_path = os.path.join(self.output_dir, f"irefindex_data.csv")
+        irefindex_df_unique.to_csv(output_path, index=False)
 
         return output_path
 
@@ -323,7 +325,9 @@ class IRefIndexAdapter:
 
         if self.export_csvs:
             irefindex_output_path = self.export_dataframe(irefindex_df_unique, "irefindex")
-            logger.info(f'Final IRefIndex data is written: {irefindex_output_path}')
+            logger.info(f'Final IRefIndex data is written: {irefindex_output_path}') 
+             # UnboundLocalError: cannot access local variable 'irefindex_output_path' where it is not associated with a value
+
 
         self.final_irefindex_ints = irefindex_df_unique
         logger.info("FINAL DATAFRAME:{}".format(self.final_irefindex_ints)) # --> processed dataframe
@@ -336,15 +340,7 @@ class IRefIndexAdapter:
         adapter constructor.
         """
 
-        logger.info("Generating nodes from the tutorial.")
 
-        self.nodes = []
-
-        if IRefIndexNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields)) for _ in range(100)]
-
-        for node in self.nodes:
-            yield (node.get_id(), node.get_label(), node.get_properties())
         
             
     def set_edge_fields(self) -> list:
@@ -376,7 +372,6 @@ class IRefIndexAdapter:
         
     
 
-            
     def get_edges(self) -> list:
         """
         Get PPI edges from biogrid data
@@ -442,87 +437,4 @@ class IRefIndexAdapter:
 
 
 
-class Node:
-    """
-    Base class for nodes.
-    """
-
-    def __init__(self):
-        self.id = None
-        self.label = None
-        self.properties = {}
-
-    def get_id(self):
-        """
-        Returns the node id.
-        """
-        return self.id
-
-    def get_label(self):
-        """
-        Returns the node label.
-        """
-        return self.label
-
-    def get_properties(self):
-        """
-        Returns the node properties.
-        """
-        return self.properties
-## specify what is uploaded to the exel 
-    #:ID, sequence, description, taxon, id, preferred id (comes from schema_config.yaml), :LABEL
-
-
-class Protein(Node):
-    """
-    Generates instances of proteins.
-    """
-
-    def __init__(self, fields: Union[None, list[IRefIndexEdgeFields]] = None):
-        self.fields = fields
-        self.id = self._get_id()
-        self.label = "uniprot_protein"
-        self.properties = self._get_properties()
-
-
-    # ?????
-    # id is a function and join function does not work in biocypher _batch_writer.py on line 643
-        # lines.append(self.delim.join(line) + "\n")
-        #line = [n.get_id()]
-        #_id = node.get_id()
-
-    def _get_id(self):
-        """
-        Get uniprot id.
-        """
-        id_partner_a= interactions.partner_a
-        
-
-        return id_partner_a
-
-
-    def _get_properties(self):
-        properties = {}
-
-        ## pmid
-        if self.fields is not None and IRefIndexAdapterProteinNodeField.TAXON in self.fields:
-            properties["pmid"] = irefindex_pmids()
-        
-        ## method
-        #if self.fields is not None and IRefIndexAdapterProteinField.TAXON in self.fields:
-        #    properties["method"] = irefindex_method
-        
-        ## organism(taxon)
-        if self.fields is not None and IRefIndexAdapterProteinNodeField.TAXON in self.fields:
-            properties["taxon"] = irefindex_species()
-
-        ## source ??
-            
-        return properties
-
-
-# output in excel: 
-    # :ID /pmid/taxon/id/preffered_id/ :LABEL
-    # preffered id is specified in the chema_config.yaml
-    # label comes from???? 
 
