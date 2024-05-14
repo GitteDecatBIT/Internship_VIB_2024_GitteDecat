@@ -64,11 +64,11 @@ adapter = IRefIndexAdapter()
 adapter.irefindex_process()
 adapter.set_edge_fields()
 adapter.add_prefix_to_id()
-#adapter.get_nodes()
+adapter.get_nodes()
 
 
 ############# Create a knowledge graph from the adapter #############
-bc.write_nodes(adapter.get_nodes())
+#bc.write_nodes(adapter.get_nodes())
 bc.write_edges(adapter.get_edges())
 
 
