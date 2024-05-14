@@ -303,7 +303,7 @@ problems:
 ##### Updated ETN\ 
 Updated ETN for the tuesday and wednesday 
 
-#### Thusday 09/05/2024
+#### Thursday 09/05/2024
 ##### Ascension\
 Free day 
 
@@ -312,5 +312,30 @@ Free day
 Changed the way the data is downloaded in the adapter file. Use the url in the resource for downloading the data and parse the data in the adapter file other de def get_nodes.
 
 
-## Problems 
-???
+
+### Week 4
+
+#### Monday 13/05/2024
+##### Create adapter file based on biocypher tutorial\
+i changed the way that the url is specified. The url is now specified in the biocypher config file. the donwload of the data happens via the resource and the parsing of the file happens in the adapter file. 
+
+integrating the process step of biogrid in the adapter file: 
+errors: 
+1) File "/home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-fuLsphMc-py3.11/lib64/python3.11/site-packages/pandas/core/indexes/base.py", line 6251, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['uniprot_a', 'uniprot_b'] not in index"
+
+--> uniport_a and uniprot_b are not specified in the input, changed it to partner_a and partner_b
+
+2) File "/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/template_package/adapters/IRefIndex_adapter_05.py", line 252, in aggregate_fields
+    element = "|".join([str(e) for e in set(element.dropna())])
+                                        ^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'  
+
+--> the uniprot column was not correctly parsed, there were some special cases (eg: pubmed:10.1038/nsmb.2049|pubmed:21552260) and these were recognised as a list. --> Adapted the code for parsing that column 
+
+#### Tuesday 14/05/2024
+##### Update ETN \
+Updated ETN for the day before 
+##### Create an overview of the steps that need to happen in the adapter file \
+##### Create adapter file based on biocypher tutorial\
