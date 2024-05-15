@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# create knowledge grap 04 and adapter 06 work together to fully run the script 
 import random
 import string
 from enum import Enum, auto
