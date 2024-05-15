@@ -338,4 +338,7 @@ TypeError: unhashable type: 'list'
 ##### Update ETN \
 Updated ETN for the day before 
 ##### Create an overview of the steps that need to happen in the adapter file \
+
 ##### Create adapter file based on biocypher tutorial\
+got it working 
+ERROR wile writing edge data 
