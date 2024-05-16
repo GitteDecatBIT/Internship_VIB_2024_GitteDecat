@@ -10,7 +10,15 @@ date: "2024-04-23"
 
 # Background information on the traineeship topic
 
-??????
+Biocypher is created to retrieve information about certain interactions and create a knowledge graph. You can retrieve information about gene-gene interactions, protein-protein interactions, gene-disease interactions, metabolic interactions and biological processes. With this information biocypher will create a visual representation of the complexes.  
+
+To be able to create a knowledge graph you need results from a database. Biocypher uses a collection of reusable “adapters” for different sources of biomedical knowledge. Due to the use of adapters, a reproducible knowledge graph can be created and shared for every specific task.  
+VIB works with the database IRefIndex and would like to be able to use biocypher to create a knowledge graph. The problem is that there is not a adapter available for the IRefIndex database. In this adapter has to be defined where you can find specific information and what has to happen with that information. In particular they want to get information about the protein-protein interactions when creating the knowledge graph.  
+
+Examples that will be used to create the adapter file are from CROssBAR. CROssBAR is a comprehensive system that integrates large-scale biological/biomedical data from various resources and stores them in a NoSQL database. CROssBAR is enriched with the deep-learning-based prediction of relationships between numerous data entries, which is followed by the rigorous analysis of the enriched data to obtain biologically meaningful modules. These complex sets of entities and relationships are displayed to users via easy-to-interpret, interactive knowledge graphs within an open-access service. CROssBAR knowledge graphs incorporate relevant genes-proteins, molecular interactions, pathways, phenotypes, diseases, as well as known/predicted drugs and bioactive compounds, and they are constructed on-the-fly based on simple non-programmatic user queries. These intensely processed heterogeneous networks are expected to aid systems-level research, especially to infer biological mechanisms in relation to genes, proteins, their ligands, and diseases.
+
+https://biocypher.org/
+https://academic.oup.com/nar/article/49/16/e96/6310792?login=true
 
 # TDP
 
@@ -338,7 +346,32 @@ TypeError: unhashable type: 'list'
 ##### Update ETN \
 Updated ETN for the day before 
 ##### Create an overview of the steps that need to happen in the adapter file \
-
+Created an overview for myself of which steps happen in the adapter file while getting the nodes and edges 
 ##### Create adapter file based on biocypher tutorial\
-got it working 
-ERROR wile writing edge data 
+Created an adapter file that runs fully. the nodes and edges are not correctly specifief yet, because their is no output created.
+
+
+1) Traceback (most recent call last):
+  File "/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/create_knowledge_graph_IREFINDEX_05.py", line 73, in <module>
+    bc.write_nodes(adapter.get_nodes())
+  File "/home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-fuLsphMc-py3.11/lib/python3.11/site-packages/biocypher/_core.py", line 279, in write_nodes
+    nodes = peekable(nodes)
+            ^^^^^^^^^^^^^^^
+  File "/home/guest/.cache/pypoetry/virtualenvs/biocypher-project-template-fuLsphMc-py3.11/lib/python3.11/site-packages/more_itertools/more.py", line 320, in __init__
+    self._it = iter(iterable)
+               ^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not iterable
+
+2) ERROR wile writing edge data 
+
+#### Wednesday 15/05/2024
+##### Create adapter file based on biocypher tutorial\
+Get nodes from the adapter file works + output gets created. The information in the output file is still random. Trying to figure out how to specify the correct information per node
+
+#### Thusday 16/05/2024
+##### Create adapter file based on biocypher tutorial\
+Trying to figure out how to specify the correct information per node. 
+Came accros a problem that the dataframe is too small. Way to many rows are getting removed ??
+##### Update ETN \
+Updated ETN for the day before 
+ 
