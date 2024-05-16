@@ -68,6 +68,7 @@ class IRefIndexAdapter:
                  nodes_ids= None,
             
                  ):
+        
         self.output_dir = output_dir
         self.export_csvs = export_csvs
         self.irefindex_fields = irefindex_fields
@@ -81,6 +82,7 @@ class IRefIndexAdapter:
         
 
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
+        logger.info(self.node_types)
          
         if export_csvs:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -300,6 +302,7 @@ class IRefIndexAdapter:
                 else:                
                     agg_dict[v] = "first"
         
+        # group by unique combinations of uniprot a and b
         irefindex_df_unique = irefindex_df_unique.groupby(["uniprot_a", "uniprot_b"], sort=False, as_index=False).aggregate(agg_dict)
         #biogrid_df_unique["pubmed_id"].replace("", np.nan, inplace=True)
         logger.info("9) Group the irefindex_dataframe based in uniprot_a and uniprot_b")
@@ -326,14 +329,16 @@ class IRefIndexAdapter:
 
         # Combine the unique IDs from both columns to get all nodes
         self.nodes_ids = set(nodes_a) | set(nodes_b)
-        logger.info(self.nodes_ids)
+        #logger.info(self.nodes_ids)
 
         self.nodes = []
 
         if IRefIndexNodeType.PROTEIN in self.node_types:
-            [self.nodes.append(Protein(fields=self.node_fields)) for _ in range(100)]
-
-        # node is a string and calling a method on it is not poossible 
+            for node_id in self.nodes_ids:
+                pmids = self.final_irefindex_ints.loc[(self.final_irefindex_ints["uniprot_a"] == node_id) | (self.final_irefindex_ints["uniprot_b"] == node_id), "pubmed_ids"].tolist()
+            #logger.info(pmids)
+                #logger.info(node_id)
+                self.nodes.append(Protein(node_id=node_id, pmid= pmids, fields=self.node_fields))
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
         
@@ -405,11 +410,12 @@ class IRefIndexAdapter:
         #logger.info(edge_list)
         return edge_list
 
+
     def _set_types_and_fields(self, node_types, node_fields, edge_types, edge_fields):
         if node_types:
             self.node_types = node_types
         else:
-            self.node_types = [type for type in IRefIndexEdgeFields]
+            self.node_types = [type for type in IRefIndexNodeType]
 
         if node_fields:
             self.node_fields = node_fields
@@ -472,20 +478,21 @@ class Protein(Node):
     Generates instances of proteins.
     """
 
-    def __init__(self, fields: Optional[list] = None):
+    def __init__(self, node_id:str, pmid: str, fields: Optional[list] = None):
         self.fields = fields
-        self.id = self.nodes
+        self.id = node_id
         self.label = "uniprot_protein"
-        self.properties = self._generate_properties()
+        self.properties = self._generate_properties(pmid)
+        self.pmid= pmid
 
-
-    def _generate_properties(self):
+    def _generate_properties(self, pmid):
         properties = {}
 
+        ## pmid
+        if self.fields is not None and IRefIndexEdgeFields.PUBMED_IDS in self.fields:
+            properties["pmid"] = pmid
+       
         ## taxon
-        if self.fields is not None and IRefIndexEdgeFields.TAXON in self.fields:
-            properties["taxon"] = "9606"
+        #properties["taxon"] = taxon
 
         return properties
-
-
