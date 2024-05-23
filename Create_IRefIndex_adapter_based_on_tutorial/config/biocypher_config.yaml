@@ -8,7 +8,12 @@ biocypher:
   url: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
 
 neo4j:
+  database_name: neo4j
+  wipe: true
   delimiter: '\t'
-  array_delimiter: "|"
+  array_delimiter: '|'
+  quote_character: "'"
   skip_duplicate_nodes: true
   skip_bad_relationships: true
+
+

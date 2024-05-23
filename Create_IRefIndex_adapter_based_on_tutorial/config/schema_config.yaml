@@ -4,18 +4,24 @@ protein:
     represented_as: node
     preferred_id: uniprot
     input_label: uniprot_protein
+    properties:
+        pubmed_ids: str
+        taxon: str
+        method: str
+        relationship_id: int
 
-disease:
-    represented_as: node
-    preferred_id: doid
-    input_label: do_disease
 
-protein interaction:
-    is_a: pairwise molecular interaction
-    represented_as: edge
-    input_label: protein_protein_interaction
+protein protein interaction:
+  is_a: pairwise molecular interaction
+  represented_as: edge
+  use_id: false
+  label_as_edge: protein_protein_interaction
+  source: protein
+  target: protein
+  label_in_input: protein_protein_interaction
+  properties:    
+    pubmed_ids: str
+    taxon: str
+    method: str
+    relationship_id : str
 
-protein to disease association:
-    is_a: association
-    represented_as: edge
-    input_label: protein_disease_association
