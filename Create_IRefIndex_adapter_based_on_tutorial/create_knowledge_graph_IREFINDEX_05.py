@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from biocypher import BioCypher, Resource
-from template_package.adapters.IRefIndex_adapter_09 import IRefIndexAdapter,IRefIndexNodeType
+from template_package.adapters.IRefIndex_adapter_11 import IRefIndexAdapter,IRefIndexNodeType, IRefIndexEdgeType, IRefIndexEdgeFields
 from biocypher._logger import logger
 import yaml
 import os
@@ -55,18 +55,26 @@ logger.info("Data is downloaded in this path: {}" .format(paths))
 # Choose node types to include in the knowledge graph.
 # These are defined in the adapter (`adapter.py`).
 
-node_types = [
-    IRefIndexNodeType.PROTEIN,
-]
+node_types = IRefIndexNodeType.PROTEIN,
+edge_type = IRefIndexEdgeType.PROTEIN_PROTEIN_INTERACTION
+edge_fields= [IRefIndexEdgeFields.PUBMED_IDS,
+              IRefIndexEdgeFields.TAXON, 
+              IRefIndexEdgeFields.METHODS]
 ############# Create a protein adapter instance #############
-adapter = IRefIndexAdapter()
+
+
+adapter = IRefIndexAdapter(
+    node_types=node_types,
+    edge_types=edge_type,
+    edge_fields=edge_fields, 
+    )
 
 
 
 adapter.irefindex_process()
 adapter.set_edge_fields()
 adapter.add_prefix_to_id()
-#adapter.get_nodes()
+
 
 
 ############# Create a knowledge graph from the adapter #############

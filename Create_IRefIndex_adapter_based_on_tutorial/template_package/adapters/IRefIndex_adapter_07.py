@@ -269,6 +269,9 @@ class IRefIndexAdapter:
         #logger.info("rename irefindex_dataframe:{}".format(irefindex_df))
         logger.info(" --> Renamed the headers of the irefindex_dataframe to uniprot_a and uniprot_b")
         
+        
+
+
         # drop rows if uniprot_a or uniprot_b is not a swiss-prot protein
         irefindex_df = irefindex_df[(irefindex_df["uniprot_a"].isin(self.swissprots)) & (irefindex_df["uniprot_b"].isin(self.swissprots))]
         irefindex_df.reset_index(drop=True, inplace=True)
@@ -332,6 +335,7 @@ class IRefIndexAdapter:
         #logger.info(self.nodes_ids)
 
         self.nodes = []
+        # efetch for pubmed 
 
         if IRefIndexNodeType.PROTEIN in self.node_types:
             for node_id in self.nodes_ids:
