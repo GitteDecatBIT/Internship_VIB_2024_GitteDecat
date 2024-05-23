@@ -371,7 +371,14 @@ Get nodes from the adapter file works + output gets created. The information in 
 #### Thusday 16/05/2024
 ##### Create adapter file based on biocypher tutorial\
 Trying to figure out how to specify the correct information per node. 
-Came accros a problem that the dataframe is too small. Way to many rows are getting removed ??
+Came accros a problem that the dataframe is too small. Way to many rows are getting removed --> filters to strict based on the swissprot ids 
 ##### Update ETN \
 Updated ETN for the day before 
+
+#### Friday 17/05/2024
+
+
+#### feedback from internal supervisor 
+- When executing the script you should be able to filter on organism --> at this moment it is only 7227 from the url that is specified 
+
  
