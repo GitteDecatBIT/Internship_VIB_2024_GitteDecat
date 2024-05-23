@@ -294,6 +294,9 @@ class IRefIndexAdapter:
         #logger.info("rename irefindex_dataframe:{}".format(irefindex_df))
         logger.info(" --> Renamed the headers of the irefindex_dataframe to uniprot_a and uniprot_b")
         
+        #drop complexes and refseq 
+        
+
         # drop rows if uniprot_a or uniprot_b is not a swiss-prot protein
         # this is to strict --> removes id like A0A021WW32 & X2JKM9(trembl) --> not reviewed by humans
         #with swissprot= none you do look at reviewed and unreviewed 
