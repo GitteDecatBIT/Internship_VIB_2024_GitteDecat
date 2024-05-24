@@ -2,8 +2,8 @@
 
 protein:
     represented_as: node
-    preferred_id: uniprot
-    input_label: uniprot_protein
+    preferred_id: [uniprot, entrez,refseq]
+    input_label: [uniprot_protein, entrez_protein,refseq_protein] 
     properties:
         pubmed_ids: str
         taxon: str
