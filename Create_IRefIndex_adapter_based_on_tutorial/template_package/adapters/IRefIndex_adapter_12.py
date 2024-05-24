@@ -13,6 +13,9 @@ from time import time
 from typing import Optional
 from bioregistry import normalize_curie
 from tqdm import tqdm # progress bar
+import requests
+
+from pypath.inputs import uniprot
 
 logger.debug(f"Loading module {__name__}.")
 
@@ -88,8 +91,8 @@ class IRefIndexAdapter:
         IRefIndexInteraction = collections.namedtuple(
             'IRefIndexInteraction',
             (
-                'partner_a',
-                'partner_b',
+                'partner_a_uniprot',
+                'partner_a_refseq',
                 'pmid', 
                 'method',
                 'taxon', 
@@ -117,6 +120,8 @@ class IRefIndexAdapter:
         
         # Open the file
         with open(inputfile_path, 'r') as file:
+             # Skip the header line
+            header = file.readline()
             logger.info("--> Getting inforamtion for partner_a, partner_b, pubmed_id, method and taxon id")
             for line in file:
                 # Split the line by tab character
@@ -124,44 +129,45 @@ class IRefIndexAdapter:
                 
                 # PARTNER_A: finalReference A 
                 input_partner_a = l[38]
+                #logger.info(input_partner_a)
+                
                 
                 # PARTNER_B: FinalReference B 
                 input_partner_b = l[39]
-
+                
                 # skip lines that start with complex 
                 if input_partner_a.startswith('complex:') or input_partner_b.startswith('complex:'):
                     continue
-                if input_partner_a.startswith('refseq:') or input_partner_b.startswith('refseq:'):
-                    continue
-                # moeten kunnen gebruiken 
-
+                
                 if input_partner_a.startswith('pdb:') or input_partner_b.startswith('pdb:'):
                     continue
-                if input_partner_a.startswith('dbj/embl/genbank:') or input_partner_b.startswith('dbj/embl/genbank:'):
-                    continue
-                # embl ook meenemen --> genbank --> entrez protein ???
 
                 if input_partner_a.startswith('flybase:') or input_partner_b.startswith('flybase:'):
                     continue
                 
-                #isolate id for partner_a
-                parts = input_partner_a.split(":")
-                partner_a = parts[1] if len(parts) > 1 else ""
+                partner_a_refseq = ""
+                partner_a_uniprot = ""
 
-                input_partner_a = l[38]
-                parts = input_partner_a.split(":") # Splitting the string at ":"
-                if len(parts) > 1:
-                    partner_a = parts[1] # Selecting the second part after ":"
-                else:
-                    partner_a = ""
+                if input_partner_a.startswith('refseq:'):
+                    parts_partner_a_refseq = input_partner_a.split(":")
+                    if len(parts_partner_a_refseq) > 1:
+                        partner_a_refseq = parts_partner_a_refseq[1]  
+                    else:
+                        partner_a_refseq = ""
+                    
+                    #logger.info(partner_a_refseq)
 
-                #isolate id for partner_b
-                parts = input_partner_b.split(":")
-                if len(parts) > 1:
-                    partner_b = parts[1]  
-                else:
-                    partner_b= ""
+                elif input_partner_a.startswith('uniprot:'):
+                    parts_partner_a_uniprot = input_partner_a.split(":")
+                    if len(parts_partner_a_uniprot) > 1:
+                        partner_a_uniprot = parts_partner_a_uniprot[1]  
+                    else:
+                        partner_a_uniprot = ""
+                    #logger.info(partner_a_uniprot)
+                    
+
                 
+
                 # PUBMED_ID
                 input_pmid = l[8]
                 # Split the string by '|'
@@ -212,8 +218,8 @@ class IRefIndexAdapter:
 
                 interactions.append(
                     IRefIndexInteraction(
-                        partner_a=partner_a,
-                        partner_b=partner_b,
+                        partner_a_refseq = partner_a_refseq, 
+                        partner_a_uniprot = partner_a_uniprot,
                         pmid=pmid,
                         method=method,
                         taxon=taxon,
@@ -227,7 +233,37 @@ class IRefIndexAdapter:
             #logger.info(interactions)
             return interactions
         
-    
+
+    """
+    def map_refseq_to_uniprot(refseq_ids):
+        url = 'https://rest.uniprot.org/idmapping/run'
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            "from": "RefSeq",
+            "to": "UniProtKB",
+            "ids": refseq_ids
+        }
+        
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        job_id = response.json()['jobId']
+        
+        # Check job status and get results
+        results_url = f'https://rest.uniprot.org/idmapping/results/{job_id}'
+        while True:
+            result_response = requests.get(results_url)
+            result_response.raise_for_status()
+            result_data = result_response.json()
+            if result_data['jobStatus'] == 'FINISHED':
+                break
+        logger.info(result_data)
+        return result_data['mappedResults']
+
+    # Example usage
+    refseq_ids = ["NP_000257.3", "NP_000305.3"]  # Replace with your RefSeq IDs
+    mapped_results = map_refseq_to_uniprot(refseq_ids)
+    print(mapped_results)
+    """
 
     def get_nodes(self, rename_selected_fields: Union[None, list[str]] = None):
         """
@@ -266,6 +302,8 @@ class IRefIndexAdapter:
             self.irefindex_field_new_names["partner_b"] = "uniprot_b"
         
         logger.info("--> Changing 'partner_a' and 'partner_b' to 'uniprot_a' and 'uniprot_b'")
+
+  
         
         t1 = time()
                         
@@ -359,7 +397,6 @@ class IRefIndexAdapter:
          
         t3= time()
         if IRefIndexNodeType.PROTEIN in self.node_types:
-            logger.info("Getting pubmed ids")
             for node_id in self.nodes_ids:
         # Create Protein object for the current node_id with corresponding taxon
                 taxon = node_id_to_taxon.get(node_id, None)        
@@ -367,7 +404,7 @@ class IRefIndexAdapter:
                 method= node_id_to_method.get(node_id, None)
                 self.nodes.append(Protein(node_id=node_id, taxon=taxon,pubmed_id= pubmed_id,method =method,  fields=self.node_fields))
                 #self.nodes.append(Protein(node_id=node_id, taxon=taxon, pubmed_id= pubmed_id))
-
+        
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
 

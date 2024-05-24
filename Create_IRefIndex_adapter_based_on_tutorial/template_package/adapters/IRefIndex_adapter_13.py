@@ -41,10 +41,17 @@ class IRefIndexAdapter:
         edge_types: List of edge types to include in the result.
         edge_fields: List of edge fields to include in the result.
     """
-    def __init__(self,output_dir = None,irefindex_fields: Union[None, list[IRefIndexEdgeFields]] = None, 
-                 add_prefix = True, aggregate_pubmed_ids: bool = True,aggregate_methods: bool = True,nodes_ids= None,
-                 node_types: Union[None, list[IRefIndexNodeType]] = None,node_fields:Union[None, list[IRefIndexEdgeFields]] = None,
-                 edge_types: Union[None, list[IRefIndexEdgeType]] = None, edge_fields:Union[None, list[IRefIndexEdgeFields]] = None,
+    def __init__(self,
+                 output_dir = None,
+                 irefindex_fields: Union[None, list[IRefIndexEdgeFields]] = None, 
+                 add_prefix = True, 
+                 aggregate_pubmed_ids: bool = True,
+                 aggregate_methods: bool = True,
+                 nodes_ids= None,
+                 node_types: Union[None, list[IRefIndexNodeType]] = None,
+                 node_fields:Union[None, list[IRefIndexEdgeFields]] = None,
+                 edge_types: Union[None, list[IRefIndexEdgeType]] = None, 
+                 edge_fields:Union[None, list[IRefIndexEdgeFields]] = None,
                  ):
         
         self.output_dir = output_dir
@@ -52,7 +59,6 @@ class IRefIndexAdapter:
         self.add_prefix= add_prefix 
         self.nodes_ids = nodes_ids
         self.add_prefix = add_prefix
-
         self.aggregate_dict = {IRefIndexEdgeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
                               IRefIndexEdgeFields.METHODS.value:aggregate_methods}
         
@@ -131,15 +137,9 @@ class IRefIndexAdapter:
                 # skip lines that start with complex 
                 if input_partner_a.startswith('complex:') or input_partner_b.startswith('complex:'):
                     continue
-                if input_partner_a.startswith('refseq:') or input_partner_b.startswith('refseq:'):
-                    continue
-                # moeten kunnen gebruiken 
-
+               
                 if input_partner_a.startswith('pdb:') or input_partner_b.startswith('pdb:'):
                     continue
-                if input_partner_a.startswith('dbj/embl/genbank:') or input_partner_b.startswith('dbj/embl/genbank:'):
-                    continue
-                # embl ook meenemen --> genbank --> entrez protein ???
 
                 if input_partner_a.startswith('flybase:') or input_partner_b.startswith('flybase:'):
                     continue
@@ -220,14 +220,12 @@ class IRefIndexAdapter:
                         relationship_id=relationship_id,
                     )
                 )
-            #logger.info(partner_a)  
-            #logger.info(partner_b)
+
             logger.info("--> Succesfully extracted columns from the IRefIndex database!")
             self.irefindex_ints = interactions
-            #logger.info(interactions)
             return interactions
         
-    
+
 
     def get_nodes(self, rename_selected_fields: Union[None, list[str]] = None):
         """
@@ -265,52 +263,31 @@ class IRefIndexAdapter:
             self.irefindex_field_new_names["partner_a"] = "uniprot_a"
             self.irefindex_field_new_names["partner_b"] = "uniprot_b"
         
-        logger.info("--> Changing 'partner_a' and 'partner_b' to 'uniprot_a' and 'uniprot_b'")
-        
         t1 = time()
                         
         # create dataframe     
         irefindex_data_without_headers = self.irefindex_ints[1:]     
         irefindex_df = pd.DataFrame.from_records(irefindex_data_without_headers, columns=self.irefindex_ints[0]._fields)
-        #logger.info("initial dataframe:{}".format(irefindex_df))
-
-        #logger.info("create irefindex_dataframe:{}".format(irefindex_df)) # --> partner_a |partner_b |pmid |method |taxon
         logger.info("--> Created an irefindex_dataframe")
 
-        
         # add source database info
         irefindex_df["source"] = "IRefIndex"
 
         # filter selected fields
         irefindex_df = irefindex_df[list(self.irefindex_field_new_names.keys())]
-        #logger.info("filter irefindex_dataframe:{}".format(irefindex_df)) # --> pmid| taxon| method| partner_a |partner_b
         logger.info("--> Filtered the irefindex_dataframe")
         
         # rename columns
         irefindex_df.rename(columns=self.irefindex_field_new_names, inplace=True)
-        #logger.info("rename irefindex_dataframe:{}".format(irefindex_df))
         logger.info("--> Renamed the headers of the irefindex_dataframe to uniprot_a and uniprot_b")
         
-        #drop complexes and refseq 
-        
 
-        # drop rows if uniprot_a or uniprot_b is not a swiss-prot protein
-        # this is to strict --> removes id like A0A021WW32 & X2JKM9(trembl) --> not reviewed by humans
-        #with swissprot= none you do look at reviewed and unreviewed 
-        #irefindex_df = irefindex_df[(irefindex_df["uniprot_a"].isin(self.swissprots)) & (irefindex_df["uniprot_b"].isin(self.swissprots))]
-        #irefindex_df.reset_index(drop=True, inplace=True)
-        #logger.info("drop in irefindex_dataframe if not in swissprot :{}".format(irefindex_df)) # --> pubmed_ids | taxon | method |uniprot_a |uniprot_b
-        #logger.info(" --> Dropped the rows in irefindex_dataframe if uniprot_a or uniprot_b is not in swissprot")
-        
         # drop duplicates if same a x b pair exists multiple times 
         # keep the first pair and collect pubmed ids of duplicated a x b pairs in that pair's pubmed id column
         # if a x b pair has same experimental system type with b x a pair, drop b x a pair
         irefindex_df_unique = irefindex_df.dropna(subset=["uniprot_a", "uniprot_b"]).reset_index(drop=True)        
-        #logger.info(" --> Created a unique irefindex_dataframe, removed duplicates:{} ".format(irefindex_df_unique))
-        
-        
+                
         def aggregate_fields(element):
-            #logger.info("element:{}".format(element)) # element is pubmed id 
             element = "|".join([str(e) for e in set(element.dropna())])
             if not element:
                 return np.nan
@@ -341,12 +318,26 @@ class IRefIndexAdapter:
 
         self.final_irefindex_ints = irefindex_df_unique
         logger.info("FINAL DATAFRAME:\n{}".format(self.final_irefindex_ints)) 
-          
-        # Extract unique UniProt IDs from both columns
+                
+
+        # Function to determine if an ID is a UniProt ID
+        def is_uniprot_id(node_id):
+            return bool(re.match(r'^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$', node_id))
+        
+        # Function to determine if an ID is a refseq ID
+        def is_refseq_id(node_id):
+            return bool(re.match(r'^(((AC|AP|NC|NG|NM|NP|NR|NT|NW|WP|XM|XP|XR|YP|ZP)_\d+)|(NZ_[A-Z]{2,4}\d+))(\.\d+)?', node_id))
+        
+        def is_entrez_id(node_id):
+            return bool(re.match(r'^[A-Z]+[0-9]+(\.\d+)?$', node_id))
+
+
+        # Extract unique IDs from both columns
         nodes_a = irefindex_df_unique["uniprot_a"].unique()
         nodes_b = irefindex_df_unique["uniprot_b"].unique()
-        self.nodes_ids = set(nodes_a) | set(nodes_b)
-        
+        nodes_ids = set(nodes_a) | set(nodes_b)
+
+        # Map node IDs to their properties
         node_id_to_taxon = dict(zip(irefindex_df_unique["uniprot_a"], irefindex_df_unique["taxon"]))
         node_id_to_taxon.update(zip(irefindex_df_unique["uniprot_b"], irefindex_df_unique["taxon"]))
 
@@ -355,18 +346,29 @@ class IRefIndexAdapter:
 
         node_id_to_method = dict(zip(irefindex_df_unique["uniprot_a"], irefindex_df_unique["method"]))
         node_id_to_method.update(zip(irefindex_df_unique["uniprot_b"], irefindex_df_unique["method"]))
+
         self.nodes = []
-         
+
+        # Example field list, replace with actual field list from your context
+        self.node_fields = ["pubmed_ids", "taxon", "method"]
+
         t3= time()
         if IRefIndexNodeType.PROTEIN in self.node_types:
-            logger.info("Getting pubmed ids")
-            for node_id in self.nodes_ids:
-        # Create Protein object for the current node_id with corresponding taxon
-                taxon = node_id_to_taxon.get(node_id, None)        
-                pubmed_id= node_id_to_pubmed_id.get(node_id, None)
-                method= node_id_to_method.get(node_id, None)
-                self.nodes.append(Protein(node_id=node_id, taxon=taxon,pubmed_id= pubmed_id,method =method,  fields=self.node_fields))
-                #self.nodes.append(Protein(node_id=node_id, taxon=taxon, pubmed_id= pubmed_id))
+            for node_id in nodes_ids:
+                taxon = node_id_to_taxon.get(node_id, None)
+                pubmed_id = node_id_to_pubmed_id.get(node_id, None)
+                method = node_id_to_method.get(node_id, None)
+
+                if is_uniprot_id(node_id):
+                    protein_type = "uniprot_protein"
+
+                elif is_refseq_id(node_id):
+                    protein_type = "refseq_protein"
+
+                elif is_entrez_id(node_id):
+                    protein_type = "entrez_protein"
+
+                self.nodes.append(Protein(node_id=node_id, protein_type=protein_type, taxon=taxon, pubmed_id=pubmed_id, method=method, fields=self.node_fields))
 
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
@@ -387,20 +389,24 @@ class IRefIndexAdapter:
         else:
             return [field.value for field in self.irefindex_fields]
         
-    
-    def add_prefix_to_id(self, prefix="uniprot", identifier=None, sep=":") -> str:
+        
+    def add_prefix_to_id(self, prefix_uniprot='uniprot',prefix_entrez='entrez',prefix_refseq='refseq',protein_type= None,  identifier=None, sep=":") -> str:
         """
         Adds prefix to uniprot id
         """
         if self.add_prefix and identifier:
-            return normalize_curie( prefix + sep + str(identifier))
+            if protein_type == "uniprot":
+                return normalize_curie(prefix_uniprot + sep + str(identifier))
+            elif protein_type == "entrez":
+                return normalize_curie(prefix_entrez + sep + str(identifier))
+            elif protein_type == "refseq":
+                return normalize_curie(prefix_refseq + sep + str(identifier))
     
         
         return identifier # --> none 
        
 
 
-        #https://github.com/biocypher/dependency-map/blob/main/dmb/adapter.py#L342 --> line 312 ( get nodes)
         
         
 
@@ -437,7 +443,6 @@ class IRefIndexAdapter:
 
         
         return edge_list
-
         
 class Node:
     """
@@ -473,28 +478,26 @@ class Protein(Node):
     Generates instances of proteins.
     """
 
-    def __init__(self, node_id:str, taxon:str, pubmed_id: str, method: str, fields: Optional[list] = None):
+    def __init__(self, node_id:str, protein_type: str, taxon:str, pubmed_id: str, method: str, fields: Optional[list] = None):
         self.fields = fields
         self.id = node_id
-        self.label = "uniprot_protein"
+        self.label = protein_type
         self.properties = self._generate_properties(taxon, pubmed_id,method)
         self.taxon = taxon
         self.pubmed_id =pubmed_id
         self.method = method 
         
-    def _generate_properties(self,taxon,pubmed_id,method):
+    def _generate_properties(self, taxon, pubmed_id, method):
         properties = {}
 
-        ## pmid
-        if self.fields is not None and IRefIndexEdgeFields.PUBMED_IDS in self.fields:
-           properties["pmid"] = pubmed_id
-       
-        ## taxon
-        if self.fields is not None and IRefIndexEdgeFields.TAXON in self.fields:
-           properties["taxon"] = taxon
+        if self.fields is None or "pubmed_ids" in self.fields:
+            properties["pubmed_ids"] = pubmed_id
 
-        ## method
-        if self.fields is not None and IRefIndexEdgeFields.TAXON in self.fields:
-           properties["method"] = method
+        if self.fields is None or "taxon" in self.fields:
+            properties["taxon"] = taxon
+
+        if self.fields is None or "method" in self.fields:
+            properties["method"] = method
 
         return properties
+    

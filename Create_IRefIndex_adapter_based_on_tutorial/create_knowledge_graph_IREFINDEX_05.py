@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from biocypher import BioCypher, Resource
-from template_package.adapters.IRefIndex_adapter_11 import IRefIndexAdapter,IRefIndexNodeType, IRefIndexEdgeType, IRefIndexEdgeFields
+from template_package.adapters.IRefIndex_adapter_13 import IRefIndexAdapter,IRefIndexNodeType, IRefIndexEdgeType, IRefIndexEdgeFields
 from biocypher._logger import logger
 import yaml
 import os
@@ -35,7 +35,7 @@ if not url:
     print("URL not found in the config!")
     exit()
 
-logger.info("This is the link of IRefIndex data that is downloaded:{}".format(url))
+logger.info("This is the link of IRefIndex data that is downloaded:{}, pleae check if it is up to date".format(url))
 
 
 ############# Specify resource #############
