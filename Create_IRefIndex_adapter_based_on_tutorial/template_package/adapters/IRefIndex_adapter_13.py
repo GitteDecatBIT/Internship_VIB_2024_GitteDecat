@@ -389,24 +389,34 @@ class IRefIndexAdapter:
         else:
             return [field.value for field in self.irefindex_fields]
         
+    def add_prefix_to_id(self, identifier=None, sep=":") -> str:
+        """
+        Adds prefix to the protein id based on the identifier type
+        """ 
+        # Function to determine if an ID is a UniProt ID
+        def is_uniprot_id(identifier):
+            return bool(re.match(r'^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?(\-\d+)?$', identifier))
         
-    def add_prefix_to_id(self, prefix_uniprot='uniprot',prefix_entrez='entrez',prefix_refseq='refseq',protein_type= None,  identifier=None, sep=":") -> str:
-        """
-        Adds prefix to uniprot id
-        """
+        # Function to determine if an ID is a refseq ID
+        def is_refseq_id(identifier):
+            return bool(re.match(r'^(((AC|AP|NC|NG|NM|NP|NR|NT|NW|WP|XM|XP|XR|YP|ZP)_\d+)|(NZ_[A-Z]{2,4}\d+))(\.\d+)?$', identifier))
+        
+        def is_entrez_id(identifier):
+            return bool(re.match(r'^[A-Z]+[0-9]+(\.\d+)?$', identifier))
+        
         if self.add_prefix and identifier:
-            if protein_type == "uniprot":
-                return normalize_curie(prefix_uniprot + sep + str(identifier))
-            elif protein_type == "entrez":
-                return normalize_curie(prefix_entrez + sep + str(identifier))
-            elif protein_type == "refseq":
-                return normalize_curie(prefix_refseq + sep + str(identifier))
-    
+            if is_uniprot_id(identifier):
+                prefix = "uniprot"
+            elif is_refseq_id(identifier):
+                prefix = "refseq"
+            elif is_entrez_id(identifier):
+                prefix = "entrez"
+            else:
+                prefix= ""
+
+            return normalize_curie(prefix + sep + str(identifier))
         
-        return identifier # --> none 
-       
-
-
+        return identifier
         
         
 

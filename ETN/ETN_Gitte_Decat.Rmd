@@ -371,14 +371,78 @@ Get nodes from the adapter file works + output gets created. The information in 
 #### Thusday 16/05/2024
 ##### Create adapter file based on biocypher tutorial\
 Trying to figure out how to specify the correct information per node. 
-Came accros a problem that the dataframe is too small. Way to many rows are getting removed --> filters to strict based on the swissprot ids 
+Came accros a problem that the dataframe is too small. Way to many rows are getting removed --> filters to strict based on the swissprot ids
+Removed the part from the code where they remove rows from the dataframe if uniprot_a or uniprot_b are not in swissprot 
 ##### Update ETN \
 Updated ETN for the day before 
 
 #### Friday 17/05/2024
+##### Create adapter file based on biocypher tutorial\
+Trying to figure out how to specify the correct information per node (pmid and taxon)
+##### Intermediate evaluation 
+Got feedback from my internal supervisor on my skills and got feedback on my ETN from my external supervisor
+
+
+### Week 4
+
+#### Monday 20/05/2024
+#####PentecostMonday\
+Free day 
+
+#### Tuesday 21/05/2024
+##### Create adapter file based on biocypher tutorial\
+Trying to figure out how to specify the correct information per node (method)
+
+problems: 
+1) ERROR -- Error while writing edge data.
+
+--> biocypher/biocypher/write/_batch_writer.py line 380
+
+edge_list: 
+in code: edge_list.append((None, _source, _target, "Interacts_With", _props)) 
+in terminal: (None, 'uniprot:X2JFU8', 'uniprot:P40793', 'Interacts_With', {'pubmed_ids': '36436559', 'taxon': '7227', 'method': 'pull down'})]
+
+
+2) WARNING -- The ontology contains multiple inheritance (one child node has multiple parent nodes). This is not visualized in the following hierarchy tree (the child node is only added once). If you want to browse all relationships of the parsed ontology write a graphml file to disk and view this file.
+
+--> biocypher/biocypher/_misc.py line 117
+
+#### Wednesday 22/05/2024
+##### Create adapter file based on biocypher tutorial\
+Fixed the problem when writing edge data --> specified the right label in the config file ( these 2 did were not the same in the separate scripts)
+
+#### Thusday 23/05/2024
+##### Create adapter file based on biocypher tutorial\
+Integrated refseq and genbank in the adapter file so that these ids were not skipped in the process step. 
+tried mapping the refseq and genbank ids to uniprot ids, but this was to difficult because not all refseq ids had a uniprot id that they could be mapped to. 
+
+#### Friday 24/05/2024
+##### Create adapter file based on biocypher tutorial\
+Integrated the refseq and genbank ids in the config file so that the scripts creates separate output files for the different types of id. 
+adapted the get_nodes function to make it possible to create those separate files per id type 
+
+solution: 
+- Function to determine if an ID is a UniProt ID
+def is_uniprot_id(node_id):
+    return bool(re.match(r'^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$', node_id))
+        
+- Function to determine if an ID is a refseq ID
+def is_refseq_id(node_id):
+    return bool(re.match(r'^(((AC|AP|NC|NG|NM|NP|NR|NT|NW|WP|XM|XP|XR|YP|ZP)_\d+)|(NZ_[A-Z]{2,4}\d+))(\.\d+)?', node_id))
+
+- Function to determine if an ID is an entrez ID  
+def is_entrez_id(node_id):
+    return bool(re.match(r'^[A-Z]+[0-9]+(\.\d+)?$', node_id))
+    
+Tried specifying the right prefix to the id when getting the edges, but this part does not work yet. the right prefix ( type of id) is not integrated in the output file yet. 
+##### ETN updated\
+updated my ETN for the past few days 
+
+
 
 
 #### feedback from internal supervisor 
+- refseq and genbank should not be skipped, they should be integrated in the dataframe
 - When executing the script you should be able to filter on organism --> at this moment it is only 7227 from the url that is specified 
 
  
