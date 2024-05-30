@@ -5,16 +5,16 @@ biocypher:
   debug: false
   schema_config_path: config/schema_config.yaml
   cache_directory: .cache
-  url:
-    all: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/All.mitab.08-28-2023.txt.zip"
-    homo_sapiens: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/9606.mitab.08-28-2023.txt.zip"
-    mus_musculus: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/10090.mitab.08-28-2023.txt.zip"
-    saccharomyces_cerevisiae_S288C: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/559292.mitab.08-28-2028.txt"
-    escherichia: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/562.mitab.08-28-2023.txt.zip"
-    rattus_norvegicus: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/10116.mitab.08-28-2023.txt.zip"
-    saccharomyces_cerevisiae: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/4932.mitab.08-28-2023.txt.zip"
-    drosophila_melanogaster: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
-    caenorhabditis_elegans: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/6239.mitab.08-28-2023.txt.zip"
+  #url:
+  #  all: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/All.mitab.08-28-2023.txt.zip"
+  #  homo_sapiens: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/9606.mitab.08-28-2023.txt.zip"
+  #  mus_musculus: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/10090.mitab.08-28-2023.txt.zip"
+  #  saccharomyces_cerevisiae_S288C: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/559292.mitab.08-28-2028.txt"
+  #  escherichia: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/562.mitab.08-28-2023.txt.zip"
+  #  rattus_norvegicus: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/10116.mitab.08-28-2023.txt.zip"
+  #  saccharomyces_cerevisiae: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/4932.mitab.08-28-2023.txt.zip"
+  #  drosophila_melanogaster: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/7227.mitab.08-28-2023.txt.zip"
+  #  caenorhabditis_elegans: "https://storage.googleapis.com/irefindex-data/archive/release_20.0/psi_mitab/MITAB2.6/6239.mitab.08-28-2023.txt.zip"
 
 
 neo4j:
