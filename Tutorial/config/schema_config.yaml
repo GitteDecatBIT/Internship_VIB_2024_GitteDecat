@@ -1,0 +1,65 @@
+# add your desired knowledge graph components here
+
+gene:
+  represented_as: node
+  preferred_id: ncbigene
+  label_in_input: gene
+  properties:    
+    gene_names: str[]
+    kegg_ids: str[]
+    ensembl_transcript_ids: str[]
+    ensembl_gene_ids: str[]
+    gene_symbol: str
+
+protein:
+  represented_as: node
+  preferred_id: [uniprot, entrez,refseq]
+  input_label: [uniprot_protein, entrez_protein,refseq_protein] 
+  properties:
+    length: int
+    mass: int
+    primary_protein_name: str
+    protein_name: str[]
+    xref_proteomes: str[]
+    organism_name: str
+    organism_id: int
+    sequence: str
+    prott5_embedding: float[]
+  
+organism taxon:
+  represented_as: node
+  preferred_id: ncbitaxon
+  label_in_input: organism
+  properties:
+    organism_name: str
+
+
+protein protein interaction:
+  is_a: pairwise molecular interaction
+  represented_as: edge
+  use_id: false
+  label_as_edge: protein_protein_interaction
+  source: protein
+  target: protein
+  label_in_input: protein_protein_interaction
+  properties:    
+    pubmed_ids: str
+    taxon: str
+    method: str
+    relationship_id : str
+
+gene to protein relationship:
+  is_a: gene to gene product relationship
+  represented_as: edge
+  label_as_edge: Gene_encodes_protein
+  source: gene
+  target: protein
+  label_in_input: Gene_encodes_protein
+
+protein to organism taxon association:
+  is_a: association
+  represented_as: edge
+  label_as_edge: Protein_belongs_to_organism
+  source: protein
+  target: organismTaxon
+  label_in_input: Protein_belongs_to_organism

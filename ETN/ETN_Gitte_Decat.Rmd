@@ -383,7 +383,7 @@ Trying to figure out how to specify the correct information per node (pmid and t
 Got feedback from my internal supervisor on my skills and got feedback on my ETN from my external supervisor
 
 
-### Week 4
+### Week 5
 
 #### Monday 20/05/2024
 #####PentecostMonday\
@@ -438,8 +438,46 @@ Tried specifying the right prefix to the id when getting the edges, but this par
 ##### ETN updated\
 updated my ETN for the past few days 
 
+#### Friday 24/05/2024
+##### Create adapter file based on biocypher tutorial\
+Fixed the problem when specifying the protien type in the protein interactions output file. 
+add.prefix def --> if self.add_prefix and identifier:
+            if is_uniprot_id(identifier):
+                prefix = "uniprot"
+            elif is_refseq_id(identifier):
+                prefix = "refseq"
+            elif is_entrez_id(identifier):
+                prefix = "entrez"
+            else:
+                prefix= "")
+##### ETN updated\
+updated my ETN for the past few days 
+
+### Week 6
+#### Monday  27/05/2024
+##### Created a tutorial\
+Checked if my running script and the irefindex adapter file could go together with the uniprot adapter file from crossbar. 
+Tried downloading the uniprot data using the same logic as the irefindex adapter file --< donwloading via the resource from biocypher --> too difficult 
 
 
+#### Tuesday  28/05/2024
+##### Created a tutorial\
+Used the uniprot adapter file from crossbar to download and proces the data --> had some problems when trying to execute the uniprot adapter file. Had to change some versions of packages that are specified in the toml file: downgraded pypath-omnipath and upgraded pydantic? 
+##### Feedback on adapter file\
+Got some feedback on my adapter file from James, he told me some things i needed to change to make the code better/more logic 
+
+feedback: 
+- create the url based on taxon_id and release version --> changed this in the create_knowledge_graph
+- change absolute path to the config file in the create_knowledge_graph and the absolute path to the inpit file in the adapter file from irefindex
+- specify the organism if you selected to donwload the file that contains all the organisms
+- relationship_id is still in the node output csv, this does not need to be there
+- error while writing edge data when downloading the file that contains all the organisms 
+- defs to get the protein types are specified twice, maybe change this so you dont repeat things 
+restrict to 1 organism --> sometimes there are more taxon_id in the output files 
+- QC!!!!
+
+#### Wednesday 29/05/2024
+fixed somethings from the feedback! i changed the absolute paths using os. i created the url where you can specify the taxon_id and the relase version. this works for the files thta contains 1 organisms, but when i want to run the all organisms file i get an error while writing the edge data.
 
 #### feedback from internal supervisor 
 - refseq and genbank should not be skipped, they should be integrated in the dataframe
