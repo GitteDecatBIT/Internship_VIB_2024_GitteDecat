@@ -2,7 +2,6 @@
 from biocypher._logger import logger
 from enum import Enum, auto
 from typing import Union
-from pathlib import Path
 from itertools import chain
 import os 
 import collections
@@ -20,6 +19,11 @@ logger.debug(f"Loading module {__name__}.")
 class IRefIndexNodeType(Enum):
     PROTEIN= auto()
 
+class IRefIndexNodeFields(Enum):
+    PUBMED_IDS = "pmid"
+    TAXON= "taxon"
+    METHODS = "method"
+
 class IRefIndexEdgeType(Enum):
     """
     Enum for the types of the protein adapter.
@@ -27,9 +31,6 @@ class IRefIndexEdgeType(Enum):
     PROTEIN_PROTEIN_INTERACTION = "protein_protein_interaction"
 
 class IRefIndexEdgeFields(Enum):
-    PUBMED_IDS = "pmid"
-    TAXON= "taxon"
-    METHODS = "method"
     RELATIONSHIP_ID = "relationship_id"
 
 class IRefIndexAdapter:
@@ -50,7 +51,7 @@ class IRefIndexAdapter:
                  aggregate_methods: bool = True,
                  nodes_ids= None,
                  node_types: Union[None, list[IRefIndexNodeType]] = None,
-                 node_fields:Union[None, list[IRefIndexEdgeFields]] = None,
+                 node_fields:Union[None, list[IRefIndexNodeFields]] = None,
                  edge_types: Union[None, list[IRefIndexEdgeType]] = None, 
                  edge_fields:Union[None, list[IRefIndexEdgeFields]] = None,
                  ):
@@ -60,8 +61,8 @@ class IRefIndexAdapter:
         self.add_prefix= add_prefix 
         self.nodes_ids = nodes_ids
         self.add_prefix = add_prefix
-        self.aggregate_dict = {IRefIndexEdgeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
-                              IRefIndexEdgeFields.METHODS.value:aggregate_methods}
+        self.aggregate_dict = {IRefIndexNodeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
+                              IRefIndexNodeFields.METHODS.value:aggregate_methods}
         
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
         
@@ -75,7 +76,7 @@ class IRefIndexAdapter:
         if node_fields:
             self.node_fields = node_fields
         else:
-            self.node_fields = [field for field in chain()]
+            self.node_fields = [field for field in chain(IRefIndexNodeType)]
 
         if edge_types:
             self.edge_types = edge_types
@@ -111,7 +112,7 @@ class IRefIndexAdapter:
             for file in files:
                 if file.endswith(".txt"):
                     inputfile= os.path.join(root, file)
-        logger.info("This is the input file that is used: {}, please check if it is correct".format(inputfile))
+        logger.info("This is the input file that is used: {}".format(inputfile))
             
 
         # parsing text file 
@@ -120,16 +121,16 @@ class IRefIndexAdapter:
         
         # Open the file
         with open(inputfile, 'r') as file:
-            logger.info("--> Getting inforamtion for partner_a, partner_b, pubmed_id, method, taxon id and relationship id")
+            logger.info("Getting inforamtion for partner_a, partner_b, pubmed_id, method, taxon id and relationship id")
             for line in file:
                 # Split the line by tab character
-                l = line.split('\t')
+                line = line.split('\t')
                 
                 # PARTNER_A: finalReference A 
-                input_partner_a = l[38]
+                input_partner_a = line[38]
                 
                 # PARTNER_B: FinalReference B 
-                input_partner_b = l[39]
+                input_partner_b = line[39]
 
                 # skip lines that start with complex 
                 if input_partner_a.startswith('complex:') or input_partner_b.startswith('complex:'):
@@ -145,7 +146,7 @@ class IRefIndexAdapter:
                 parts = input_partner_a.split(":")
                 partner_a = parts[1] if len(parts) > 1 else ""
 
-                input_partner_a = l[38]
+                input_partner_a = line[38]
                 parts = input_partner_a.split(":") # Splitting the string at ":"
                 if len(parts) > 1:
                     partner_a = parts[1] # Selecting the second part after ":"
@@ -160,7 +161,7 @@ class IRefIndexAdapter:
                     partner_b= ""
                 
                 # PUBMED_ID
-                input_pmid = l[8]
+                input_pmid = line[8]
                 # Split the string by '|'
                 parts = input_pmid.split('|')
                 # Take the last part of the split
@@ -176,7 +177,7 @@ class IRefIndexAdapter:
                 #pmid = re.findall(pattern_pmid, input_pmid)
 
                 # METHOD
-                input_method= l[6]
+                input_method= line[6]
                 pattern_method= r'\((.*?)\)'
                 match_method= re.search(pattern_method, input_method)
                 if match_method:
@@ -185,7 +186,7 @@ class IRefIndexAdapter:
                     method = ""
 
                 # ORGANISM/taxon 
-                input_taxon= l[10]
+                input_taxon= line[10]
                 pattern_taxon= r'taxid:(\d+)'
                 match_taxon= re.search(pattern_taxon, input_taxon)
                 if match_taxon:
@@ -194,7 +195,7 @@ class IRefIndexAdapter:
                     taxon = ""
 
                 # relationship id 
-                input_relationhsip_id= l[13]
+                input_relationhsip_id= line[13]
                 pattern_relationship_id = r"rigid:([^|]+)"
 
                 # Search for the pattern in the column value
@@ -235,7 +236,9 @@ class IRefIndexAdapter:
         """
         logger.info("Generating nodes.")
 
-        selected_fields = self.set_edge_fields()
+        selected_node_fields = self.set_node_fields()
+        selected_edge_fields = self.set_edge_fields()
+        selected_fields = selected_node_fields + selected_edge_fields
             
         default_field_names = {"pmid":"pubmed_ids", "taxon":"taxon" ,"method":"method", "relationship_id":"relationship_id"}
         
@@ -261,7 +264,8 @@ class IRefIndexAdapter:
         
         t1 = time()
                         
-        # create dataframe     
+        # create dataframe  
+        logger.info("Creating a dataframe from the input")   
         irefindex_data_without_headers = self.irefindex_ints[1:]     
         irefindex_df = pd.DataFrame.from_records(irefindex_data_without_headers, columns=self.irefindex_ints[0]._fields)
 
@@ -341,8 +345,13 @@ class IRefIndexAdapter:
         # Example field list, replace with actual field list from your context
         self.node_fields = ["pubmed_ids", "taxon", "method"]
 
+        from create_knowledge_graph_IREFINDEX_06 import get_taxon_id
+        taxon_id = get_taxon_id()
+
+        filtered_nodes = [node for node in nodes_ids if node_id_to_taxon.get(node) == taxon_id]
+
         if IRefIndexNodeType.PROTEIN in self.node_types:
-            for node_id in nodes_ids:
+            for node_id in filtered_nodes:
                 taxon = node_id_to_taxon.get(node_id, None)
                 pubmed_id = node_id_to_pubmed_id.get(node_id, None)
                 method = node_id_to_method.get(node_id, None)
@@ -364,9 +373,18 @@ class IRefIndexAdapter:
         t2 = time()
         logger.info(f'IRefIndex data is processed in {round((t2-t1) / 60, 2)} mins')
          
+    def set_node_fields(self) -> list:
+        """
+        Returns:
+            selected field list
+        """
+        if self.irefindex_fields is None:
+            return [field.value for field in IRefIndexNodeFields]
+        else:
+            return [field.value for field in self.irefindex_fields]
+        
     def set_edge_fields(self) -> list:
         """
-        Sets biogrid edge fields
         Returns:
             selected field list
         """
@@ -410,7 +428,7 @@ class IRefIndexAdapter:
         """
         Get  edges from merged data
         Args:
-            label: label of protein-protein interaction edges
+            label: label of protein-protein interaction edges --> Must be same as in the schema_config.yaml file 
         """
         logger.info("Generating edges.")
 
@@ -479,7 +497,7 @@ class Protein(Node):
         self.fields = fields
         self.id = node_id
         self.label = protein_type
-        self.properties = self._generate_properties(taxon, pubmed_id,method)
+        self.properties = self._generate_properties(taxon,pubmed_id,method)
         self.taxon = taxon
         self.pubmed_id =pubmed_id
         self.method = method 

@@ -2,7 +2,6 @@
 from biocypher._logger import logger
 from enum import Enum, auto
 from typing import Union
-from pathlib import Path
 from itertools import chain
 import os 
 import collections
@@ -20,6 +19,11 @@ logger.debug(f"Loading module {__name__}.")
 class IRefIndexNodeType(Enum):
     PROTEIN= auto()
 
+class IRefIndexNodeFields(Enum):
+    PUBMED_IDS = "pmid"
+    TAXON= "taxon"
+    METHODS = "method"
+
 class IRefIndexEdgeType(Enum):
     """
     Enum for the types of the protein adapter.
@@ -27,9 +31,6 @@ class IRefIndexEdgeType(Enum):
     PROTEIN_PROTEIN_INTERACTION = "protein_protein_interaction"
 
 class IRefIndexEdgeFields(Enum):
-    PUBMED_IDS = "pmid"
-    TAXON= "taxon"
-    METHODS = "method"
     RELATIONSHIP_ID = "relationship_id"
 
 class IRefIndexAdapter:
@@ -44,13 +45,13 @@ class IRefIndexAdapter:
     """
     def __init__(self,
                  output_dir = None,
-                 irefindex_fields: Union[None, list[IRefIndexEdgeFields]] = None, 
+                 irefindex_fields: Union[None, list[IRefIndexNodeFields, IRefIndexEdgeFields]] = None, 
                  add_prefix = True, 
                  aggregate_pubmed_ids: bool = True,
                  aggregate_methods: bool = True,
                  nodes_ids= None,
                  node_types: Union[None, list[IRefIndexNodeType]] = None,
-                 node_fields:Union[None, list[IRefIndexEdgeFields]] = None,
+                 node_fields:Union[None, list[IRefIndexNodeFields]] = None,
                  edge_types: Union[None, list[IRefIndexEdgeType]] = None, 
                  edge_fields:Union[None, list[IRefIndexEdgeFields]] = None,
                  ):
@@ -60,23 +61,21 @@ class IRefIndexAdapter:
         self.add_prefix= add_prefix 
         self.nodes_ids = nodes_ids
         self.add_prefix = add_prefix
-        self.aggregate_dict = {IRefIndexEdgeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
-                              IRefIndexEdgeFields.METHODS.value:aggregate_methods}
+        self.aggregate_dict = {IRefIndexNodeFields.PUBMED_IDS.value:aggregate_pubmed_ids,
+                              IRefIndexNodeFields.METHODS.value:aggregate_methods}
         
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
         
-    def _set_types_and_fields(self, node_types, node_fields, edge_types, edge_fields):
+    def _set_types_and_fields(self, node_types,node_fields, edge_types, edge_fields):
 
         if node_types:
             self.node_types = node_types
         else:
             self.node_types = [type for type in IRefIndexNodeType]
-
         if node_fields:
             self.node_fields = node_fields
         else:
-            self.node_fields = [field for field in chain()]
-
+            self.node_fields = [field for field in chain(IRefIndexNodeFields)]
         if edge_types:
             self.edge_types = edge_types
         else:
@@ -89,7 +88,6 @@ class IRefIndexAdapter:
       
     def irefindex_process(self):
 
-        logger.info("EXECUTING THE ADAPTER FILE:")
         logger.info("Extracting information from IRefIndex data")
         
         IRefIndexInteraction = collections.namedtuple(
@@ -103,10 +101,7 @@ class IRefIndexAdapter:
                 'relationship_id',
             ),
         )
-        
-        logger.info("1) Created a collection 'IRefIndexInteractions' for the variables: ")
-        logger.info("2) Data is downloaded by the resource as a zip file and will be unzipped in a certain folder --> location of the text file that is needed")
-        
+                
         # Get the current directory
         current_directory = os.getcwd()
 
@@ -115,26 +110,25 @@ class IRefIndexAdapter:
             for file in files:
                 if file.endswith(".txt"):
                     inputfile= os.path.join(root, file)
-        logger.info(inputfile)
+        logger.info("This is the input file that is used: {}".format(inputfile))
             
 
         # parsing text file 
-        logger.info("4)Exctracting information in certain columns from the IRefIndex database")
 
         interactions = []
         
         # Open the file
         with open(inputfile, 'r') as file:
-            logger.info("--> Getting inforamtion for partner_a, partner_b, pubmed_id, method and taxon id")
+            logger.info("Getting inforamtion for partner_a, partner_b, pubmed_id, method, taxon id and relationship id")
             for line in file:
                 # Split the line by tab character
-                l = line.split('\t')
+                line = line.split('\t')
                 
                 # PARTNER_A: finalReference A 
-                input_partner_a = l[38]
+                input_partner_a = line[38]
                 
                 # PARTNER_B: FinalReference B 
-                input_partner_b = l[39]
+                input_partner_b = line[39]
 
                 # skip lines that start with complex 
                 if input_partner_a.startswith('complex:') or input_partner_b.startswith('complex:'):
@@ -150,7 +144,7 @@ class IRefIndexAdapter:
                 parts = input_partner_a.split(":")
                 partner_a = parts[1] if len(parts) > 1 else ""
 
-                input_partner_a = l[38]
+                input_partner_a = line[38]
                 parts = input_partner_a.split(":") # Splitting the string at ":"
                 if len(parts) > 1:
                     partner_a = parts[1] # Selecting the second part after ":"
@@ -165,7 +159,7 @@ class IRefIndexAdapter:
                     partner_b= ""
                 
                 # PUBMED_ID
-                input_pmid = l[8]
+                input_pmid = line[8]
                 # Split the string by '|'
                 parts = input_pmid.split('|')
                 # Take the last part of the split
@@ -181,7 +175,7 @@ class IRefIndexAdapter:
                 #pmid = re.findall(pattern_pmid, input_pmid)
 
                 # METHOD
-                input_method= l[6]
+                input_method= line[6]
                 pattern_method= r'\((.*?)\)'
                 match_method= re.search(pattern_method, input_method)
                 if match_method:
@@ -190,7 +184,7 @@ class IRefIndexAdapter:
                     method = ""
 
                 # ORGANISM/taxon 
-                input_taxon= l[10]
+                input_taxon= line[10]
                 pattern_taxon= r'taxid:(\d+)'
                 match_taxon= re.search(pattern_taxon, input_taxon)
                 if match_taxon:
@@ -199,7 +193,7 @@ class IRefIndexAdapter:
                     taxon = ""
 
                 # relationship id 
-                input_relationhsip_id= l[13]
+                input_relationhsip_id= line[13]
                 pattern_relationship_id = r"rigid:([^|]+)"
 
                 # Search for the pattern in the column value
@@ -212,18 +206,19 @@ class IRefIndexAdapter:
                 else:
                     relationship_id =""
 
-                yield (
-                    partner_a, 
-                    partner_b,
-                    pmid, 
-                    method, 
-                    taxon, 
-                    relationship_id
+                interactions.append(
+                    IRefIndexInteraction(
+                        partner_a=partner_a,
+                        partner_b=partner_b,
+                        pmid=pmid,
+                        method=method,
+                        taxon=taxon,
+                        relationship_id=relationship_id,
+                    )
                 )
-                
-                
+                # yield
 
-            logger.info("--> Succesfully extracted columns from the IRefIndex database!")
+            logger.info("--> Succesfully extracted information from the IRefIndex database!")
             self.irefindex_ints = interactions
             return interactions
         
@@ -237,12 +232,13 @@ class IRefIndexAdapter:
          Args:
             rename_selected_fields : List of new field names for selected fields. If not defined, default field names will be used.
         """
-        logger.info("5) Generating nodes.")
+        logger.info("Generating nodes.")
 
-        selected_fields = self.set_edge_fields()
+        selected_node_fields  = self.set_node_fields()
 
-        logger.info("6) Started processing IRefIndex data")
-            
+        selected_edge_fields  = self.set_edge_fields()
+        selected_fields= selected_node_fields + selected_edge_fields
+
         default_field_names = {"pmid":"pubmed_ids", "taxon":"taxon" ,"method":"method", "relationship_id":"relationship_id"}
         
         self.irefindex_field_new_names = {}
@@ -267,27 +263,24 @@ class IRefIndexAdapter:
         
         t1 = time()
                         
-        # create dataframe     
+        # create dataframe  
+        logger.info(" Creating a dataframe from the input")   
         irefindex_data_without_headers = self.irefindex_ints[1:]     
         irefindex_df = pd.DataFrame.from_records(irefindex_data_without_headers, columns=self.irefindex_ints[0]._fields)
-        logger.info("--> Created an irefindex_dataframe")
 
         # add source database info
         irefindex_df["source"] = "IRefIndex"
 
         # filter selected fields
         irefindex_df = irefindex_df[list(self.irefindex_field_new_names.keys())]
-        logger.info("--> Filtered the irefindex_dataframe")
         
         # rename columns
-        irefindex_df.rename(columns=self.irefindex_field_new_names, inplace=True)
-        logger.info("--> Renamed the headers of the irefindex_dataframe to uniprot_a and uniprot_b")
-        
+        irefindex_df.rename(columns=self.irefindex_field_new_names, inplace=True)        
 
         # drop duplicates if same a x b pair exists multiple times 
         # keep the first pair and collect pubmed ids of duplicated a x b pairs in that pair's pubmed id column
         # if a x b pair has same experimental system type with b x a pair, drop b x a pair
-        irefindex_df_unique = irefindex_df.dropna(subset=["uniprot_a", "uniprot_b"]).reset_index(drop=True)        
+        irefindex_df_unique = irefindex_df.dropna(subset=["uniprot_a", "uniprot_b"]).reset_index(drop=True)  
                 
         def aggregate_fields(element):
             element = "|".join([str(e) for e in set(element.dropna())])
@@ -295,8 +288,6 @@ class IRefIndexAdapter:
                 return np.nan
             else:
                 return element
-        logger.info("7) Takes an element representing the Pubmed_id + drops any missing values ")
-        logger.info("8) Converts remaining values to a set to remove duplicates + joins them into a single string separated by '|'. This operation effectively aggregates multiple PubMed IDs into a single string.")
 
         if any(list(self.aggregate_dict.values())):
             agg_field_list = [k for k, v in self.aggregate_dict.items() if v]
@@ -311,7 +302,17 @@ class IRefIndexAdapter:
         # group by unique combinations of uniprot a and b
         irefindex_df_unique = irefindex_df_unique.groupby(["uniprot_a", "uniprot_b"], sort=False, as_index=False).aggregate(agg_dict)
         #biogrid_df_unique["pubmed_id"].replace("", np.nan, inplace=True)
-        logger.info("9) Group the irefindex_dataframe based in uniprot_a and uniprot_b")
+
+        # Drop any remaining duplicates just in case
+        irefindex_df_unique = irefindex_df_unique.drop_duplicates(subset=["uniprot_a", "uniprot_b"])
+
+        from create_knowledge_graph_IREFINDEX_06 import get_taxon_id
+        taxon_id = get_taxon_id()
+        logger.info("taxon_id: {}". format(taxon_id))
+
+        irefindex_df_unique = irefindex_df_unique[irefindex_df_unique['taxon'] == taxon_id]
+
+        logger.info(irefindex_df_unique)
         
         if "method" in self.irefindex_field_new_names.keys():            
             irefindex_df_unique = irefindex_df_unique[~irefindex_df_unique[["uniprot_a", "uniprot_b", self.irefindex_field_new_names["method"]]].apply(frozenset, axis=1).duplicated()].reset_index(drop=True)
@@ -354,7 +355,11 @@ class IRefIndexAdapter:
         # Example field list, replace with actual field list from your context
         self.node_fields = ["pubmed_ids", "taxon", "method"]
 
-        t3= time()
+        #from create_knowledge_graph_IREFINDEX_06 import get_taxon_id
+        #taxon_id = get_taxon_id()
+#
+        #filtered_nodes = [node for node in nodes_ids if node_id_to_taxon.get(node) == taxon_id]
+
         if IRefIndexNodeType.PROTEIN in self.node_types:
             for node_id in nodes_ids:
                 taxon = node_id_to_taxon.get(node_id, None)
@@ -375,14 +380,21 @@ class IRefIndexAdapter:
         for node in self.nodes:
             yield (node.get_id(), node.get_label(), node.get_properties())
 
-        t4= time()
-        logger.info(f'Getting information like pubmed_id and taxon from dataframe in {round((t4-t3) / 60, 2)} mins')
         t2 = time()
         logger.info(f'IRefIndex data is processed in {round((t2-t1) / 60, 2)} mins')
          
+    def set_node_fields(self) -> list:
+        """
+        Returns:
+            selected field list
+        """
+        if self.irefindex_fields is None:
+            return [field.value for field in IRefIndexNodeFields]
+        else:
+            return [field.value for field in self.irefindex_fields]
+ 
     def set_edge_fields(self) -> list:
         """
-        Sets biogrid edge fields
         Returns:
             selected field list
         """
@@ -426,8 +438,9 @@ class IRefIndexAdapter:
         """
         Get  edges from merged data
         Args:
-            label: label of protein-protein interaction edges
+            label: label of protein-protein interaction edges --> Must be same as in the schema_config.yaml file 
         """
+        logger.info("Generating edges.")
 
         # create edge list
         edge_list = []
@@ -494,7 +507,7 @@ class Protein(Node):
         self.fields = fields
         self.id = node_id
         self.label = protein_type
-        self.properties = self._generate_properties(taxon, pubmed_id,method)
+        self.properties = self._generate_properties(taxon,pubmed_id,method)
         self.taxon = taxon
         self.pubmed_id =pubmed_id
         self.method = method 
