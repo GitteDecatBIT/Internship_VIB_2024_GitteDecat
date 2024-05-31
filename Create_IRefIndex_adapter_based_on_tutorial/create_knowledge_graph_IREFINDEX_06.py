@@ -22,7 +22,7 @@ Caenorhabditis elegans: 6239
 
 """
 release_version = "release_20.0"
-taxon_id = "7955"
+taxon_id = "9771"
 
 taxon_ids = {
     'homo sapiens': '9606',

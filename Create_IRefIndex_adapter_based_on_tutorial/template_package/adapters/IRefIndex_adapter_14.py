@@ -310,6 +310,12 @@ class IRefIndexAdapter:
         taxon_id = get_taxon_id()
         logger.info("taxon_id: {}". format(taxon_id))
 
+        # Check if the taxon_id is present in the DataFrame
+        if taxon_id not in irefindex_df_unique['taxon'].values:
+            error_message = f"Taxon ID {taxon_id} not found in the DataFrame."
+            logger.error(error_message)
+            raise ValueError(error_message)
+        
         irefindex_df_unique = irefindex_df_unique[irefindex_df_unique['taxon'] == taxon_id]
 
         logger.info(irefindex_df_unique)
