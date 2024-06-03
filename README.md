@@ -24,7 +24,7 @@ pipx ensurepath
 sudo pipx ensurepath --global # optional to allow pipx actions in global scope. See "Global installation" section below.
 ```
 
-###€ On Linux:
+#### On Linux:
 ```bash
 Ubuntu 23.04 or above
 sudo apt update
@@ -33,7 +33,7 @@ pipx ensurepath
 sudo pipx ensurepath --global # optional to allow pipx actions in global scope. See "Global installation" section below.
 ```
 
-###€ Fedora:
+#### Fedora:
 ```bash
 sudo dnf install pipx
 pipx ensurepath
@@ -67,47 +67,47 @@ If so, go to the mentioned folder, allowing you to run the pipx executable direc
 
 ```
 
-### Install poetry: \
+### Install poetry: 
 ```bash
 pipx install poetry
 ```
 
-### Clone the github repository:\
+### Clone the github repository:
 ```bash
 git clone git@github.com:GitteDecatBIT/Internship_VIB_2024_GitteDecat.git
 cd Internship_VIB_2024_GitteDecat
 ```
 
-### Install BioCypher as a dependency: \
+### Install BioCypher as a dependency: 
 
 ```bash
 poerty add biocypher 
 ```
 
-### Install the dependencies using Poetry: \
+### Install the dependencies using Poetry: 
 ```
 poetry install 
 ```
 
-### Activate environment that poetry create:\
+### Activate environment that poetry create:
 ```
 poetry shell 
 ```
 
-# Usage: 
+## Usage: 
 run the python script that will create the knowledge graph 
 ```bash
 python create_knowledge_graph_IrefIndex.py
 ```
-#Adapter file 
+## Adapter file 
 BioCypher is a modular framework, with the main purpose of avoiding redundant maintenance work for users. To achieve this, they use a collection of reusable “adapters” for the different sources of biomedical knowledge as well as for different ontologies. 
 In this github repository you can find the adapter file that is created for the IRefIndex database. This adapter file is created based on the tutorial that biocypher gives and the adapter files from the CROssBAR github repository 
 
 https://github.com/biocypher/project-template.git
 https://github.com/HUBioDataLab/CROssBARv2.git
 
-## Structure
-.
+### Structure
+```bash
 │  # Project setup
 │
 ├── LICENSE
@@ -124,6 +124,7 @@ https://github.com/HUBioDataLab/CROssBARv2.git
 └── template_package
     └── adapters
         └── adapter.py
+```
 
 ## Running the pipeline
 
@@ -138,7 +139,7 @@ schema_config.yaml: a configuration file that defines the schema of the knowledg
 biocypher_config.yaml: a configuration file that defines some BioCypher parameters, such as the mode, the separators used, and other options. More on its use can be found in the Documentation.
 https://biocypher.org/installation.html#configuration
 
-# Output: 
+## Output: 
 You will get different csv files as an output. You get a file that contains the nodes (proteins) with corresponding information as well as a file that contains the edges (interactions between the proteins) with their corresponding information. 
 
 Next to the csv files you get a neo4j-admin-import-call.sh. this is an executable shell script in the output directory that can be executed from the location of the database folder to import the graph into Neo4j. Since BioCypher creates separate header and data files for each entity type, the import call conveniently aggregates this information into one command, detailing the location of all files on disk, so no data need to be copied around.
