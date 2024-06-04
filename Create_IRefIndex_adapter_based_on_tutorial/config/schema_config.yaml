@@ -8,7 +8,7 @@ protein:
         pubmed_ids: str
         taxon: str
         method: str
-        relationship_id: int
+        
 
 
 protein protein interaction:
