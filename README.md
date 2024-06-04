@@ -5,7 +5,7 @@ In this github repository you can find all the scripts that are made during my t
 ## Goal:
 
 The purpose of my traineeship is to create an adapter file for the IRefIndex database to be able to create a knowledge graph using biocypher. 
-![Biocypher process](./graphical_abstract.png)
+![Biocypher process](/home/guest/Github/Internship_VIB_2024_GitteDecat/graphical_abstract.png)
 
 ## IRefIndex database
 ??

@@ -3,10 +3,9 @@ from biocypher import BioCypher, Resource
 from template_package.adapters.IRefIndex_adapter_14 import IRefIndexAdapter,IRefIndexNodeType, IRefIndexNodeFields, IRefIndexEdgeType, IRefIndexEdgeFields
 from biocypher._logger import logger
 
-
+############# Download data #############
 # Define the taxon_id and the release version 
-#This can be another taxon_id then in the list, if it is not in the list, 
-# a file will be downloaded that contains alle the organisms and will be filtered on the specified taxon_id
+# if you want to specify a taxon_id that is not in the list below, the file "All" will be downloaded and filtered on taxon_id
 
 """
 Create a url that will download data for a given organism
@@ -22,7 +21,7 @@ Caenorhabditis elegans: 6239
 
 """
 release_version = "release_20.0"
-taxon_id = "9771"
+taxon_id = "7227"
 
 taxon_ids = {
     'homo sapiens': '9606',
@@ -35,8 +34,6 @@ taxon_ids = {
     'Caenorhabditis elegans': '6239'
 }
 
-############# Download data #############
-
 if taxon_id not in taxon_ids.values():
     logger.info(f"Taxon ID {taxon_id} not recognized. Downloading file for 'all organisms'.")
     url = "https://storage.googleapis.com/irefindex-data/archive/{}/psi_mitab/MITAB2.6/All.mitab.08-28-2023.txt.zip".format(release_version)
@@ -47,11 +44,9 @@ else:
 logger.info("This is the link of IRefIndex data that is downloaded:{}".format(url))
 
 
-# Main execution part (only runs when script1.py is executed directly)
+# Main execution part 
 if __name__ == "__main__":
     # Instantiate the BioCypher interface
-    # You can use `config/biocypher_config.yaml` to configure the framework or
-    # supply settings via parameters below
     bc = BioCypher(biocypher_config_path= r"config/biocypher_config.yaml",
                    schema_config_path= r"config/schema_config.yaml")
 
@@ -60,16 +55,14 @@ if __name__ == "__main__":
     resource = Resource(
         name="IRefIndex",  # Name of the resource
         url_s=url,
-        lifetime=0,  # days cache lifetime
+        lifetime=0,  
     )
-    # PROBLEM: when setting lifetime to 0 it always downloads it again
 
     paths = bc.download(resource)  # Downloads to '.cache' by default
     logger.info("Data is downloaded in this path: {}".format(paths))
 
     # Choose node types to include in the knowledge graph.
     # These are defined in the adapter file.
-
     node_types = IRefIndexNodeType.PROTEIN,
     node_fields = [IRefIndexNodeFields.PUBMED_IDS,
                    IRefIndexNodeFields.TAXON,
@@ -90,7 +83,6 @@ if __name__ == "__main__":
     adapter.add_prefix_to_id()
 
     ############# Create a knowledge graph from the adapter #############
-    
     bc.write_nodes(adapter.get_nodes())
     bc.write_edges(adapter.get_edges())
 
