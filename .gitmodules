@@ -1,3 +1,6 @@
 [submodule "Github_Repository_CROssBAR/CROssBARv2"]
 	path = Github_Repository_CROssBAR/CROssBARv2
 	url = git@github.com:HUBioDataLab/CROssBARv2.git
+[submodule "Github_Repository_BiocypherTutorial/project-template"]
+	path = Github_Repository_BiocypherTutorial/project-template
+	url = git@github.com:biocypher/project-template.git
