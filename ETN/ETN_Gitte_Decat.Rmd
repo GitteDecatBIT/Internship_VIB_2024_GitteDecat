@@ -409,7 +409,7 @@ in terminal: (None, 'uniprot:X2JFU8', 'uniprot:P40793', 'Interacts_With', {'pubm
 
 #### Wednesday 22/05/2024
 ##### Create adapter file based on biocypher tutorial\
-Fixed the problem when writing edge data --> specified the right label in the config file ( these 2 did were not the same in the separate scripts)
+Fixed the problem when writing edge data --> specified the right label in the config file ( these 2 were not the same in the separate scripts)
 
 #### Thusday 23/05/2024
 ##### Create adapter file based on biocypher tutorial\
@@ -477,7 +477,53 @@ restrict to 1 organism --> sometimes there are more taxon_id in the output files
 - QC!!!!
 
 #### Wednesday 29/05/2024
-fixed somethings from the feedback! i changed the absolute paths using os. i created the url where you can specify the taxon_id and the relase version. this works for the files thta contains 1 organisms, but when i want to run the all organisms file i get an error while writing the edge data.
+##### Create adapter file\
+fixed somethings from the feedback! i changed the absolute paths using os. i created the url where you can specify the taxon_id and the relase version. this works for the files that contains 1 organisms, but when i want to run the all organisms file i get an error while writing the edge data.
+
+performing the all organism file--> 
+error while writing the, it only gives the source or the target id not both 
+
+#### Thusday 30/05/2024
+##### Create adapter file\
+Tried fixing this error from wednesday, but with no success
+
+#### Friday 31/05/2024
+##### Create adapter file\
+Fixed the error by filtering on organism in the data file that contains all organisms. This was to big the process as a whole. 
+Added some error messages if the taxon_id is not in the file. 
+Fixed the problem that the relationship id is not in the output file from the nodes, deleted it from the properties in the config file 
+
+### Week 7
+
+#### Monday 03/06/2024
+##### Create tutorial with irefindex and uniprot\
+Fixed the errors when executing the uniprot adapter file, got some errors with the esm2_embedding part. Ignored this for now ( delted ot from the code). now the adapter file runs, but still gives some errors when writing the edge data (headers)
+Still a problem that i always downkoads it again.
+
+#### Tuesday 04/06/2024
+##### Installation of neo4j\
+Did not work --> w not working with the right lines of code for a red hat distribution 
+
+#### Wednesday 05/06/2024
+##### Installation + use of neo4j\
+1) 
+rpm --import https://debian.neo4j.com/neotechnology.gpg.key
+cat << EOF >  /etc/yum.repos.d/neo4j.repo
+[neo4j]
+name=Neo4j RPM Repository
+baseurl=https://yum.neo4j.com/stable/5
+enabled=1
+gpgcheck=1
+EOF
+
+2) 
+yum install neo4j-5.20.0
+
+3) 
+sudo /usr/bin/neo4j-admin database import full --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Uniprot.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Uniprot.Protein-part.*" --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Refseq.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Refseq.Protein-part.*" --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Entrez.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Entrez.Protein-part.*" --relationships="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Protein_protein_interaction-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Protein_protein_interaction-part.*" 
+
+try 2
+
 
 #### feedback from internal supervisor 
 - refseq and genbank should not be skipped, they should be integrated in the dataframe

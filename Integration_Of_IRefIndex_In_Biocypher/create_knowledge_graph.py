@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from biocypher import BioCypher, Resource
-from template_package.adapters.IRefIndex_adapter_14 import IRefIndexAdapter,IRefIndexNodeType, IRefIndexNodeFields, IRefIndexEdgeType, IRefIndexEdgeFields
+from template_package.adapters.IRefIndex_adapter import IRefIndexAdapter,IRefIndexNodeType, IRefIndexNodeFields, IRefIndexEdgeType, IRefIndexEdgeFields
 from biocypher._logger import logger
 
 ############# Download data #############

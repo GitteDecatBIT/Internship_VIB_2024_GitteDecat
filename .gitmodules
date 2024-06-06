@@ -1,9 +1,6 @@
-[submodule "Biocypher_tutorial/project-template"]
-	path = Biocypher_tutorial/project-template
-	url = git@github.com:biocypher/project-template.git
-[submodule "Biocypher_Crossbar/CROssBARv2"]
-	path = Biocypher_Crossbar/CROssBARv2
+[submodule "Github_Repository_CROssBAR/CROssBARv2"]
+	path = Github_Repository_CROssBAR/CROssBARv2
 	url = git@github.com:HUBioDataLab/CROssBARv2.git
-[submodule "Pypath/pypath"]
-	path = Pypath/pypath
-	url = git@github.com:saezlab/pypath.git
+[submodule "Github_Repository_Biocypher_Tutorial/project-template"]
+	path = Github_Repository_Biocypher_Tutorial/project-template
+	url = git@github.com:biocypher/project-template.git
