@@ -24,4 +24,3 @@ protein protein interaction:
     taxon: str
     method: str
     relationship_id : str
-
