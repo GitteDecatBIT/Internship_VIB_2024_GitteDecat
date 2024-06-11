@@ -3,8 +3,6 @@ from biocypher._logger import logger
 from enum import Enum, auto
 from typing import Union
 from itertools import chain
-import os
-import collections
 import re
 import pandas as pd
 import numpy as np
@@ -12,7 +10,7 @@ from time import time
 from typing import Optional
 from bioregistry import normalize_curie
 from tqdm import tqdm  # progress bar
-
+from dataclasses import dataclass
 
 logger.debug(f"Loading module {__name__}.")
 
@@ -20,27 +18,21 @@ logger.debug(f"Loading module {__name__}.")
 class IRefIndexNodeType(Enum):
     PROTEIN = auto()
 
-
 class IRefIndexNodeFields(Enum):
     PUBMED_IDS = "pmid"
     TAXON = "taxon"
     METHODS = "method"
 
-
 class IRefIndexEdgeType(Enum):
-    """
-    Enum for the types of the protein adapter.
-    """
-
     PROTEIN_PROTEIN_INTERACTION = "protein_protein_interaction"
-
 
 class IRefIndexEdgeFields(Enum):
     RELATIONSHIP_ID = "relationship_id"
 
 
+
 class IRefIndexAdapter:
-    """
+    """v 
     Adapter that creaes nodes and edges for creating a knowledge graph.
 
     Args:
@@ -96,30 +88,25 @@ class IRefIndexAdapter:
         else:
             self.edge_fields = [field for field in chain(IRefIndexEdgeFields)]
 
-    def irefindex_process(self):
+    def irefindex_process(self, taxon_ids, paths):
         logger.info("Extracting information from IRefIndex data")
 
-        IRefIndexInteraction = collections.namedtuple(
-            "IRefIndexInteraction",
-            (
-                "partner_a",
-                "partner_b",
-                "pmid",
-                "method",
-                "taxon",
-                "relationship_id",
-            ),
-        )
+        @dataclass
+        class Interaction:
+            partner_a: str
+            partner_b: str
+            pmid: set[str]
+            method: set[str]
+            taxon: set[str]
+            relationship_id: set[str]
+
+        interactions: dict[tuple[str, str], Interaction] = {}
 
         # Get the current directory
-        current_directory = os.getcwd()
-
-        # Iterate through the files in the current directory
-        for root, dirs, files in os.walk(current_directory):
-            for file in files:
-                if file.endswith(".txt"):
-                    inputfile = os.path.join(root, file)
+        inputfile= paths
         logger.info("This is the input file that is used: {}".format(inputfile))
+
+        ## !!!!!!##
 
         # parsing text file
 
@@ -130,112 +117,20 @@ class IRefIndexAdapter:
             logger.info(
                 "Getting inforamtion for partner_a, partner_b, pubmed_id, method, taxon id and relationship id"
             )
+
             for line in file:
-                # Split the line by tab character
-                line = line.split("\t")
-
-                # PARTNER_A: finalReference A
-                input_partner_a = line[38]
-
-                # PARTNER_B: FinalReference B
-                input_partner_b = line[39]
-
-                # skip lines that start with complex
-                if input_partner_a.startswith("complex:") or input_partner_b.startswith(
-                    "complex:"
-                ):
+                data = line.split("\t")  # or whatever
+                if data[10] not in taxon_ids:
                     continue
 
-                if input_partner_a.startswith("pdb:") or input_partner_b.startswith(
-                    "pdb:"
-                ):
-                    continue
-
-                if input_partner_a.startswith("flybase:") or input_partner_b.startswith(
-                    "flybase:"
-                ):
-                    continue
-
-                # isolate id for partner_a
-                parts = input_partner_a.split(":")
-                partner_a = parts[1] if len(parts) > 1 else ""
-
-                input_partner_a = line[38]
-                parts = input_partner_a.split(":")  # Splitting the string at ":"
-                if len(parts) > 1:
-                    partner_a = parts[1]  # Selecting the second part after ":"
+                if (data[38], data[39]) not in interactions:
+                    interactions[(data[38], data[39])] = Interaction(...)
                 else:
-                    partner_a = ""
+                    interactions[(data[38], data[39])].pmid.add(data[8])
+                    ...
+                    # etc
 
-                # isolate id for partner_b
-                parts = input_partner_b.split(":")
-                if len(parts) > 1:
-                    partner_b = parts[1]
-                else:
-                    partner_b = ""
 
-                # PUBMED_ID
-                input_pmid = line[8]
-                # Split the string by '|'
-                parts = input_pmid.split("|")
-                # Take the last part of the split
-                last_part = parts[-1]
-
-                # Split again by '.'
-                numbers = last_part.split(":")
-
-                # Take the last part of this split, which is the number
-                pmid = numbers[-1]
-
-                # pattern_pmid = r'\d+'
-                # pmid = re.findall(pattern_pmid, input_pmid)
-
-                # METHOD
-                input_method = line[6]
-                pattern_method = r"\((.*?)\)"
-                match_method = re.search(pattern_method, input_method)
-                if match_method:
-                    method = match_method.group(
-                        1
-                    )  # Extracting the text between brackets
-                else:
-                    method = ""
-
-                # ORGANISM/taxon
-                input_taxon = line[10]
-                pattern_taxon = r"taxid:(\d+)"
-                match_taxon = re.search(pattern_taxon, input_taxon)
-                if match_taxon:
-                    taxon = match_taxon.group(1)
-                else:
-                    taxon = ""
-
-                # relationship id
-                input_relationhsip_id = line[13]
-                pattern_relationship_id = r"rigid:([^|]+)"
-
-                # Search for the pattern in the column value
-                match_relationship_id = re.search(
-                    pattern_relationship_id, input_relationhsip_id
-                )
-
-                # Extract the matched value if found
-                if match_relationship_id:
-                    relationship_id = match_relationship_id.group(1)
-
-                else:
-                    relationship_id = ""
-
-                interactions.append(
-                    IRefIndexInteraction(
-                        partner_a=partner_a,
-                        partner_b=partner_b,
-                        pmid=pmid,
-                        method=method,
-                        taxon=taxon,
-                        relationship_id=relationship_id,
-                    )
-                )
 
             logger.info(
                 "--> Succesfully extracted information from the IRefIndex database!"
@@ -293,27 +188,15 @@ class IRefIndexAdapter:
         t1 = time()
 
         # create dataframe
-        logger.info(" Creating a dataframe from the input")
+        logger.info("Creating a dataframe from the input")
         irefindex_data_without_headers = self.irefindex_ints[1:]
         irefindex_df = pd.DataFrame.from_records(
             irefindex_data_without_headers, columns=self.irefindex_ints[0]._fields
         )
 
-        # add source database info
-        irefindex_df["source"] = "IRefIndex"
-
-        # filter selected fields
-        irefindex_df = irefindex_df[list(self.irefindex_field_new_names.keys())]
-
         # rename columns
         irefindex_df.rename(columns=self.irefindex_field_new_names, inplace=True)
 
-        # drop duplicates if same a x b pair exists multiple times
-        # keep the first pair and collect pubmed ids of duplicated a x b pairs in that pair's pubmed id column
-        # if a x b pair has same experimental system type with b x a pair, drop b x a pair
-        irefindex_df_unique = irefindex_df.dropna(
-            subset=["protein_a", "protein_b"]
-        ).reset_index(drop=True)
 
         def aggregate_fields(element):
             element = "|".join([str(e) for e in set(element.dropna())])
@@ -333,19 +216,11 @@ class IRefIndexAdapter:
                     agg_dict[v] = "first"
 
         # group by unique combinations of uniprot a and b
-        irefindex_df_unique = irefindex_df_unique.groupby(
+        irefindex_df_unique = irefindex_df.groupby(
             ["protein_a", "protein_b"], sort=False, as_index=False
         ).aggregate(agg_dict)
-        # biogrid_df_unique["pubmed_id"].replace("", np.nan, inplace=True)
 
-        # Drop any remaining duplicates just in case
-        irefindex_df_unique = irefindex_df_unique.drop_duplicates(
-            subset=["protein_a", "protein_b"]
-        )
-
-        from create_knowledge_graph import get_taxon_id
-
-        taxon_id = get_taxon_id()
+        taxon_id= self.get_taxon_id_from_create_knowledge_graph()
 
         # Check if the taxon_id is present in the DataFrame
         if taxon_id not in irefindex_df_unique["taxon"].values:
@@ -353,24 +228,13 @@ class IRefIndexAdapter:
             logger.error(error_message)
             raise ValueError(error_message)
 
-        irefindex_df_unique = irefindex_df_unique[
-            irefindex_df_unique["taxon"] == taxon_id
-        ]
-
-        if "method" in self.irefindex_field_new_names.keys():
-            irefindex_df_unique = irefindex_df_unique[
-                ~irefindex_df_unique[
-                    ["protein_a", "protein_b", self.irefindex_field_new_names["method"]]
-                ]
-                .apply(frozenset, axis=1)
-                .duplicated()
-            ].reset_index(drop=True)
+        if taxon_id == "*":
+            irefindex_df_unique = irefindex_df_unique
         else:
             irefindex_df_unique = irefindex_df_unique[
-                ~irefindex_df_unique[["protein_a", "protein_b"]]
-                .apply(frozenset, axis=1)
-                .duplicated()
-            ].reset_index(drop=True)
+                irefindex_df_unique["taxon"] == taxon_id
+            ]
+
 
         self.final_irefindex_ints = irefindex_df_unique
         logger.info("FINAL DATAFRAME:\n{}".format(self.final_irefindex_ints))
@@ -447,6 +311,8 @@ class IRefIndexAdapter:
 
                 elif is_entrez_id(node_id):
                     protein_type = "entrez_protein"
+                
+                node_id = self.add_prefix_to_node_id(node_id)
 
                 self.nodes.append(
                     Protein(
@@ -485,7 +351,85 @@ class IRefIndexAdapter:
         else:
             return [field.value for field in self.irefindex_fields]
 
-    def add_prefix_to_id(self, identifier=None, sep=":") -> str:
+    
+    def add_prefix_to_node_id(self, node_id=None, sep=":") -> str:
+        """
+        Adds prefix to the protein id based on the identifier type
+        """
+
+        # Function to determine if an ID is a UniProt ID
+        def is_uniprot_id(node_id):
+            return bool(
+                re.match(
+                    r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?(\-\d+)?$",
+                    node_id,
+                )
+            )
+
+        # Function to determine if an ID is a refseq ID
+        def is_refseq_id(node_id):
+            return bool(
+                re.match(
+                    r"^(((AC|AP|NC|NG|NM|NP|NR|NT|NW|WP|XM|XP|XR|YP|ZP)_\d+)|(NZ_[A-Z]{2,4}\d+))(\.\d+)?$",
+                    node_id,
+                )
+            )
+
+        def is_entrez_id(node_id):
+            return bool(re.match(r"^[A-Z]+[0-9]+(\.\d+)?$", node_id))
+
+        if self.add_prefix and node_id:
+            if is_uniprot_id(node_id):
+                prefix = "uniprot"
+            elif is_refseq_id(node_id):
+                prefix = "refseq"
+            elif is_entrez_id(node_id):
+                prefix = "entrez"
+            else:
+                prefix = ""
+
+            return normalize_curie(prefix + sep + str(node_id))
+
+        return node_id
+
+    def get_edges(self, label: str = "protein_protein_interaction") -> list[tuple]:
+        """
+        Get  edges from merged data
+        Args:
+            label: label of protein-protein interaction edges --> Must be same as in the schema_config.yaml file
+        """
+        logger.info("Generating edges.")
+
+        # create edge list
+        edge_list = []
+        for index, row in tqdm(
+            self.final_irefindex_ints.iterrows(),
+            total=self.final_irefindex_ints.shape[0],
+        ):
+            _dict = row.to_dict()
+
+            _source = self.add_prefix_to_edge_id(identifier=str(row["protein_a"]))
+            _target = self.add_prefix_to_edge_id(identifier=str(row["protein_b"]))
+
+            del _dict["protein_a"], _dict["protein_b"]
+
+            _props = {}
+            for k, v in _dict.items():
+                if str(v) != "nan":
+                    if isinstance(v, str) and "|" in v:
+                        _props[str(k).replace(" ", "_").lower()] = v.replace(
+                            "'", "^"
+                        ).split("|")
+                    else:
+                        _props[str(k).replace(" ", "_").lower()] = str(v).replace(
+                            "'", "^"
+                        )
+
+            edge_list.append((None, _source, _target, label, _props))
+
+        return edge_list
+    
+    def add_prefix_to_edge_id(self, identifier=None, sep=":") -> str:
         """
         Adds prefix to the protein id based on the identifier type
         """
@@ -524,43 +468,10 @@ class IRefIndexAdapter:
             return normalize_curie(prefix + sep + str(identifier))
 
         return identifier
+    
 
-    def get_edges(self, label: str = "protein_protein_interaction") -> list[tuple]:
-        """
-        Get  edges from merged data
-        Args:
-            label: label of protein-protein interaction edges --> Must be same as in the schema_config.yaml file
-        """
-        logger.info("Generating edges.")
 
-        # create edge list
-        edge_list = []
-        for index, row in tqdm(
-            self.final_irefindex_ints.iterrows(),
-            total=self.final_irefindex_ints.shape[0],
-        ):
-            _dict = row.to_dict()
 
-            _source = self.add_prefix_to_id(identifier=str(row["protein_a"]))
-            _target = self.add_prefix_to_id(identifier=str(row["protein_b"]))
-
-            del _dict["protein_a"], _dict["protein_b"]
-
-            _props = {}
-            for k, v in _dict.items():
-                if str(v) != "nan":
-                    if isinstance(v, str) and "|" in v:
-                        _props[str(k).replace(" ", "_").lower()] = v.replace(
-                            "'", "^"
-                        ).split("|")
-                    else:
-                        _props[str(k).replace(" ", "_").lower()] = str(v).replace(
-                            "'", "^"
-                        )
-
-            edge_list.append((None, _source, _target, label, _props))
-
-        return edge_list
 
 
 class Node:
