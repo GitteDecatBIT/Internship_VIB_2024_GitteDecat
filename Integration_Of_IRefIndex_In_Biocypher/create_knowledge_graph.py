@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 from biocypher import BioCypher, Resource
 from template_package.adapters.IRefIndex_adapter import (
     IRefIndexAdapter,
@@ -13,36 +14,31 @@ from biocypher._logger import logger
 # Define the taxon_id and the release version
 # if you want to specify a taxon_id that is not in the list below, the file "All" will be downloaded and filtered on taxon_id
 
-"""
-Create a url that will download data for a given organism
-all organisms: All
-homo sapiens: 9606
-Mus musculus: 10090
-Saccharomyces cerevisiae S288C: 559292
-Escherichia: 562
-Rattus norvegicus: 10116
-Saccharomyces cerevisiae:4932
-Drosophila melanogaster: 7227
-Caenorhabditis elegans: 6239
-
-"""
-release_version = "release_20.0"
-taxon_id = "7227"
+def get_taxon_id():
+    """Get taxon_id from command line arguments."""
+    if len(sys.argv) < 2:
+        raise ValueError("Please provide a taxon_id as a command line argument.")
+    return sys.argv[1]
 
 # Main execution part
 if __name__ == "__main__":
-    taxon_ids = {
-        "homo sapiens": "9606",
-        "Mus musculus": "10090",
-        "Saccharomyces cerevisiae S288C": "559292",
-        "Escherichia": "562",
-        "Rattus norvegicus": "10116",
-        "Saccharomyces cerevisiae": "4932",
-        "Drosophila melanogaster": "7227",
-        "Caenorhabditis elegans": "6239",
-    }
+    
+    release_version = "release_20.0"
 
-    if taxon_id not in taxon_ids.values():
+    # Set of known taxon IDs
+    known_taxon_ids = {
+        "9606",  # homo sapiens
+        "10090",  # Mus musculus
+        "559292",  # Saccharomyces cerevisiae S288C
+        "562",  # Escherichia
+        "10116",  # Rattus norvegicus
+        "4932",  # Saccharomyces cerevisiae
+        "7227",  # Drosophila melanogaster
+        "6239",  # Caenorhabditis elegans
+    }
+    taxon_id = get_taxon_id()
+
+    if taxon_id not in known_taxon_ids:
         logger.info(
             f"Taxon ID {taxon_id} not recognized. Downloading file for 'all organisms'."
         )
@@ -93,8 +89,6 @@ if __name__ == "__main__":
     )
 
     adapter.irefindex_process()
-    adapter.set_node_fields()
-    adapter.add_prefix_to_id()
 
     ############# Create a knowledge graph from the adapter #############
     bc.write_nodes(adapter.get_nodes())
