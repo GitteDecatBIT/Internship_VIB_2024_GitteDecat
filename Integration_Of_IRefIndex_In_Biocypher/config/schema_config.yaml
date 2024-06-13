@@ -6,7 +6,8 @@ protein:
     input_label: [uniprot_protein, entrez_protein,refseq_protein] 
     properties:
         pubmed_ids: str
-        taxon: str
+        taxon_a: str
+        taxon_b: str
         method: str
         
 
@@ -21,6 +22,7 @@ protein protein interaction:
   label_in_input: protein_protein_interaction
   properties:    
     pubmed_ids: str
-    taxon: str
+    taxon_a: str
+    taxon_b: str
     method: str
     relationship_id : str
