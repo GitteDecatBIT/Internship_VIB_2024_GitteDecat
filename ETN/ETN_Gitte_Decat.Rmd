@@ -382,6 +382,9 @@ Trying to figure out how to specify the correct information per node (pmid and t
 ##### Intermediate evaluation 
 Got feedback from my internal supervisor on my skills and got feedback on my ETN from my external supervisor
 
+### Intermediate evaluation traineeship
+The feedback i got from my supervisor was expected by me. I can still grow a lot in my coding skills and i am verry happy to hear that my supervisor thinks that this growth will be there at the end.
+I still have a lot to work on, but i know/feel that I am going to get there with little steps at a time.
 
 ### Week 5
 
@@ -522,11 +525,136 @@ yum install neo4j-5.20.0
 3) 
 sudo /usr/bin/neo4j-admin database import full --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Uniprot.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Uniprot.Protein-part.*" --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Refseq.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Refseq.Protein-part.*" --nodes="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Entrez.Protein-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Entrez.Protein-part.*" --relationships="/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Protein_protein_interaction-header.csv,/home/guest/Github/Internship_VIB_2024_GitteDecat/Create_IRefIndex_adapter_based_on_tutorial/biocypher-out/20240605113010/Protein_protein_interaction-part.*" 
 
-try 2
 
 
-#### feedback from internal supervisor 
-- refseq and genbank should not be skipped, they should be integrated in the dataframe
-- When executing the script you should be able to filter on organism --> at this moment it is only 7227 from the url that is specified 
+#### Thusday 06/06/2024
+##### Installation + use of neo4j\
+Dont install neo4j in terminal, do it with desktop. Tried importing data into neo4j, but got an error that some nodes are missing. looked back at the code and output from the adapter file to make sure that all the nodes are in there. Found some mistakes in the code when checking if a certain node is a uniprot/refseq/entrez protein. 
+
+#### Friday 07/06/2024
+##### Use of neo4j\
+Tried importing the data into neo4j! nodes were imported, but there were 0 relationships. Tried adjusting code in adapter file to make the format like it should be, but no success. 
+
+### WEEK 8
+
+#### Monday 10/06/2024
+##### Use of neo4j\
+Figured out the problem why the importing would not work. The ids were not the same in the nodes file and edge files. 
+Got the query to create a graph in neo4j
+
+Got feedback from James to make my code more efficient and take less memory when executing it. --> Issues in github page:
+- Tighten up memory usage
+- Add a way to not filter on taxonID (or filter on _all_ taxon ids)
+- Uncontrolled file directory walking and file input
+- Import strangeness
+- Use of no-op functions
+- Hard coded taxon IDs
+
+
+#### Tuesday 11/06/2024
+##### Integrated feedback in adapter file\
+Tried fixing some issues from github:
+
+- Changed code so the taxon_id is asked in the terminal: 
+def get_taxon_id_from_arg():
+    """Get taxon_id from command line arguments."""
+    if len(sys.argv) < 2:
+        raise ValueError("Please provide a taxon_id as a command line argument.")
+    return sys.argv[1]
+
+- Change the interaction collections to a tuple:
+@dataclass
+  class Interaction:
+      partner_a: str
+      partner_b: str
+      pmid: set[str]
+      method: set[str]
+      taxon: set[str]
+      relationship_id: set[str]
+
+  interactions: dict[tuple[str, str], Interaction] = {}
+    
+Doesnt get further then the process step--> interactions is empty
+
+#### Wednesday 12/06/2024
+##### trail presentation\
+Finished ppt ad created a text to present.
+Presented for my mentor and got some feedback and answered some questions 
+
+
+#### Thusday 13/06/2024
+##### Integrated feedback in adapter file\
+Fixed issues from github: 
+
+removed no-op functions in create_knowledge_graph
+remove import from create_knowledge_graph to get ride of cycle import --> imported as parameters when calling the function
+set an if statement to if the option to not filter on taxon_id hen entering "*"
+
+### Self-assesment\
+Learning outcome 1	
+
+The student writes, adjusts or uses code on the command line to process (biological) data, to create or manipulate a database structure, to create a (web) interface, … independent of the programming language			
+--> Good: After copying example code from the biocypher tutorial and CROssBAR, i was able to created an adapter file for IRefIndex by adapting parts of the code.
+
+The code is written in an elegant way, is not redundant and/or makes use of loop structures and functions where possible			
+--> Good:	The code that has been created uses loops if  necessairy. The running script only contains lines of code that call defenitions from the adapter file. This makes it more clear to other users to follow the steps of the process 
+
+Learning outcome 2		
+
+The student adjusts an analysis pipeline or script in a correct way, with eye for detail, with the goal to apply the pipeline or script within a new research context or on new data		
+-->Excellent:	By adding ways to download different files for different taxon_ids, I was able to handle various types of input files. IRefIndex has a list of files that can be downloaded for a few taxon_ids, if you want another taxon_id  a file that contains all organsims will be downloaded 
+
+The student is able to work with files containing data, to read data and write data to new files, to filter and/or transform data, … and to check the data for correctness		
+--> Good:	IRefIndex data is donwloaded, processed and written to output files ( nodes and edges, total of 9 output files)
+
+Learning outcome 3	
+
+The student can deposit data in a (relational) database system and/or can query a database system, whether or not by using a programming language			
+-->Sufficient:	Neo4j is used as a database to create a graph from the data. This query language was new to me
+
+The student creates a (relational) database system and/or creates a directory structure to store and organize (biological) data to be able to efficiently select data from the database/directory structure						
+-->Good:	Everything canb be found in my github repository, there is a link to the repositories a used as base to create the adapter file. Because of the readme file it is clear what to execute in which folder
+
+The student makes use of (dynamic) programming to develop an interface to visualize, analyse or store (biological) data, independent of the programming language					
+-->Good:	By creating nodes and edges with biocypher, i also get an output file that makes it possible to import data to neo4j. Neo4j is used to create a graph from that data
+
+Learning outcome 4	
+
+The student looks independently for new possibilities to program more efficiently, to store, organize or process data, to analyze data, ... and is able to apply the new techniques, with or without results		
+-->Sufficient:	This part has mostly been done by James, he took al look at my code and had some feedback to make the code more efficient 
+
+The student learns new programming and data processing techniques to store select, organize or analyze biological data in a more efficient way	--> Excellent: 	I was able to use a new database, called neo4j. This is a graph database were i got import my data that was generated and i got use the cypher query language to create a graph from the proein interactions 
+
+The student knows and spontaneously applies the rules to protect non-public data						
+--> N/A	/
+
+Learning outcome 5	
+
+The student searches for and compares various programming and data processing techniques and has insight into the advantages and disadvantages of the different techniques	
+--> Sufficient:	I did not really compare different techniques, i used the tutorial as a base an adjusted the code from there. Thelast week James took a look at my code and gave some feedback on how to make it more sufficient and he also helped with the small details to make that new version work.
+
+The student himself can select the appropriate programming language or software to process data on the basis of advantages and disadvantages	--> Good	Biocypher has a tutorial and a general set-up on how to created the files. This files are .py, .yaml and .toml files . The main scripts that had to be created be me are written in python 
+
+Learning outcome 6		
+
+The student combines programming skills with computer science knowledge and bioinformatics techniques to solve a (biological) research question, but the focus of the project remains on the bioinformatics aspect 		
+-->Good: At the and of my traineeship i was able to created an adapter file for iRefIndex ( scripts are written in python and i used neo4j to create a graph)
+
+The student can use his knowledge from multiple disciplines to summarize results in a scientifically correct way and to make a conclusion for the project				
+--> Good	After did a trail presentatin I was able to answer the questions from Alexander and James, sometimes i needed some help to get the whole answer.
+
+Learning outcome 7		
+
+The student organizes his code, information and documents in an orderly manner, uses comments to document code, keeps track of results in an (electronic) lab notebook and/or uses version control (e.g. GIT)				
+--> Excellent	I wrote everything down in my ETN and i pushed almost daily new updates to my github page 
+
+The student works fluently with colleagues, helps or asks for help wherever possible or needed, does more than just the bare minimum, …				--> Excellent	I ask for help when i need it. I wrote my questions down on paper for when my supervisor was here to answer my questions. I also had some meetings with James to check my code if i got stuck on the parts that he gave feedback on 
+
+##### International aspects\
+- Internal supervisor: Alexander Botzki, James collier 
+- James is an international college 
+- Alexander had some congresses he had to attend 
+
+
 
  
