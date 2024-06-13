@@ -83,7 +83,7 @@ pipx install poetry
 ### Clone the github repository:
 ```bash
 git clone git@github.com:GitteDecatBIT/Internship_VIB_2024_GitteDecat.git
-cd Internship_VIB_2024_GitteDecat
+cd Integration_Of_IRefIndex_In_Biocypher
 ```
 
 ### Install BioCypher as a dependency: 
@@ -105,15 +105,15 @@ poetry shell
 ## Usage: 
 run the python script that will create the knowledge graph 
 ```bash
-python create_knowledge_graph_IrefIndex.py
+python create_knowledge_graph.py
 ```
 ## Adapter file 
 BioCypher is a modular framework, with the main purpose of avoiding redundant maintenance work for users. To achieve this, they use a collection of reusable “adapters” for the different sources of biomedical knowledge as well as for different ontologies. 
 In this github repository you can find the adapter file that is created for the IRefIndex database. This adapter file is created based on the tutorial that biocypher gives and the adapter files from the CROssBAR github repository 
 
 Github repositories: 
-https://github.com/biocypher/project-template.git
-https://github.com/HUBioDataLab/CROssBARv2.git
+- https://github.com/biocypher/project-template.git
+- https://github.com/HUBioDataLab/CROssBARv2.git
 
 ### Structure
 ```bash
@@ -146,6 +146,7 @@ adapter.py: a module that defines the adapter to the data source. You can specif
 schema_config.yaml: a configuration file that defines the schema of the knowledge graph. It is used by BioCypher to map the data source to the knowledge representation on the basis of ontology.
 
 biocypher_config.yaml: a configuration file that defines some BioCypher parameters, such as the mode, the separators used, and other options. More on its use can be found in the Documentation.
+
 Website: https://biocypher.org/installation.html#configuration
 
 ## Output: 
