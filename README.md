@@ -5,7 +5,7 @@ In this github repository you can find all the scripts that are made during my t
 ## Goal:
 
 The purpose of my traineeship is to create an adapter file for the IRefIndex database to be able to create a knowledge graph using biocypher. 
-![Biocypher process](./graphical_abstract.png)
+![Biocypher process](./graphical_abstract_biocypher.png)
 
 ## IRefIndex database
 IREfIndex database is one of the biggest databases for protein-protein interactions available today. The primary goal of iRefIndex is to bring data together from multiple primary sources, such as BioGRID, IntAct, and MINT, into a single, unified format. This integration makes sure that we have access to the most complete and accurate information possible.
@@ -15,6 +15,10 @@ IREfIndex database is one of the biggest databases for protein-protein interacti
 BioCypher is the simplest way to create an AI-enabled knowledge graph for biomedical (or other) tasks. Knowledge graphs (KGs) are an approach to knowledge representation that uses graph structure to analysis of complex data.
 
 Website: https://biocypher.org/contents.html 
+
+## Neo4j: 
+
+Neo4j is a leading graph database platform designed to manage and analyze data through a graph-based approach. Unlike traditional relational databases that use tables to store data, Neo4j uses nodes, relationships, and properties to create a graph structure. This allows for the efficient handling of complex, interconnected data, making it ideal for applications like social networks, fraud detection, and recommendation systems.
 
 ## Installation of biocypher:
 
@@ -145,6 +149,13 @@ biocypher_config.yaml: a configuration file that defines some BioCypher paramete
 Website: https://biocypher.org/installation.html#configuration
 
 ## Output: 
-You will get different csv files as an output. You get a file that contains the nodes (proteins) with corresponding information as well as a file that contains the edges (interactions between the proteins) with their corresponding information. 
+You will get different csv files as an output. 
+- nodes (containing corresponding information like, pubmed_ids, taxon_id, methods)
+- edges (containing corresponding information like, pubmed_ids, taxon_id, methods, relationship_id)
 
-Next to the csv files you get a neo4j-admin-import-call.sh. this is an executable shell script in the output directory that can be executed from the location of the database folder to import the graph into Neo4j. Since BioCypher creates separate header and data files for each entity type, the import call conveniently aggregates this information into one command, detailing the location of all files on disk, so no data need to be copied around.
+Next to the csv files you get a neo4j-admin-import-call.sh. In this script you can find an command to be able to import your data to the neo4j database. Since BioCypher creates separate header and data files for each entity type, the import call conveniently aggregates this information into one command, detailing the location of all files on disk, so no data need to be copied around.
+
+You can install neo4j desktop from this page: https://neo4j.com/deployment-center/#community
+You get a installation video, you can follow to setup the desktop application. 
+
+To import the data created by biocypher to neo4j, you can follow the steps on this page: https://biocypher.org/output/neo4j.html
