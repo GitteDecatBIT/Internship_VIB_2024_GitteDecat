@@ -4,8 +4,6 @@ from enum import Enum, auto
 from typing import Union
 from itertools import chain
 import re
-#import pandas as pd
-#import numpy as np
 from time import time
 from typing import Optional
 from bioregistry import normalize_curie
@@ -23,6 +21,7 @@ class Interaction:
     method: set[str]
     taxon_a: set[str]
     taxon_b: set[str]
+    taxon_id: set[str]
     relationship_id: set[str]
 
 class IRefIndexNodeType(Enum):
@@ -40,7 +39,8 @@ class IRefIndexEdgeFields(Enum):
     RELATIONSHIP_ID = "relationship_id"
 
 
-        # Function to determine if an ID is a UniProt ID
+# Function to determine if an ID is a UniProt/Refseq/Entrez ID
+    
 def find_protein_type(node_id: str) -> Optional[str]:
     if bool(re.match(
             r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?(\-\d+)?$",
@@ -63,7 +63,7 @@ def find_protein_type(node_id: str) -> Optional[str]:
     return None
 
 class IRefIndexAdapter:
-    """v 
+    """
     Adapter that creaes nodes and edges for creating a knowledge graph.
 
     Args:
@@ -131,7 +131,7 @@ class IRefIndexAdapter:
             logger.info(
                 "Getting information for partner_a, partner_b, pubmed_id, method, taxon id and relationship id"
             )
-            
+
             for line in file:
                 # Split the line by tab character
                 line = line.split("\t")
@@ -234,6 +234,7 @@ class IRefIndexAdapter:
                         method={method} if method != "" else set(),
                         taxon_a={taxon_a} if taxon_a != "" else set(),
                         taxon_b={taxon_b} if taxon_b != "" else set(),
+                        taxon_id = {taxon_id},
                         relationship_id={relationship_id} if relationship_id != "" else set(),
                     )
                 else:
@@ -244,6 +245,8 @@ class IRefIndexAdapter:
                         self.interactions[(partner_a, partner_b)].taxon_a.add(taxon_a)
                     if taxon_b != "":
                         self.interactions[(partner_a, partner_b)].taxon_b.add(taxon_b)
+                    if taxon_id != "":
+                        self.interactions[(partner_a, partner_b)].taxon_id.add(taxon_id)
                     if relationship_id != "":
                         self.interactions[(partner_a, partner_b)].relationship_id.add(relationship_id)
 
@@ -263,6 +266,7 @@ class IRefIndexAdapter:
         """
         logger.info("Generating nodes.")
 
+        t1 = time()
 
         node_ids = set()
         self.nodes= []
@@ -271,10 +275,13 @@ class IRefIndexAdapter:
                 if node_id not in node_ids:
                     # make a Protein
                     node_ids.add(node_id)
+                    if node_id == interaction.partner_a:
+                        taxon_id = interaction.taxon_a
+                    if node_id == interaction.partner_b:
+                        taxon_id = interaction.taxon_b
 
                     # for node_id in node_ids:
-                    taxon_a = interaction.taxon_a
-                    taxon_b = interaction.taxon_b
+                    #taxon_id = interaction.taxon_id
                     pubmed_id = interaction.pmid
                     method = interaction.method
                     protein_type = f"{find_protein_type(node_id)}_protein"
@@ -284,11 +291,12 @@ class IRefIndexAdapter:
                     yield (
                         node_id, protein_type, {
                             "pubmed_ids": "|".join(pubmed_id),
-                            "taxon_a": "|".join(taxon_a),
-                            "taxon_b": "|".join(taxon_b),
+                            "taxon_id": "|".join(taxon_id),
                             "method": "|".join(method),
                         }
                     )
+        t2 = time()
+        logger.info(f"Nodes were generated in {round((t2-t1) / 60, 2)} mins")
             
     
     def add_prefix_to_identifier(self, identifier=None, sep=":") -> str:
@@ -310,6 +318,8 @@ class IRefIndexAdapter:
             label: label of protein-protein interaction edges --> Must be same as in the schema_config.yaml file
         """
         logger.info("Generating edges.")
+        t3 = time()
+
 
         # create edge list
         for row in tqdm(
@@ -330,6 +340,8 @@ class IRefIndexAdapter:
                 assert "|" not in m
 
             yield (None, _source, _target, label, props)    
+        t4 = time()
+        logger.info(f"Edges were generated in {round((t4-t3) / 60, 2)} mins")
 
 
 
