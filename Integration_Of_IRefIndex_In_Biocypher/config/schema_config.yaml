@@ -6,8 +6,7 @@ protein:
     input_label: [uniprot_protein, entrez_protein,refseq_protein] 
     properties:
         pubmed_ids: str
-        taxon_a: str
-        taxon_b: str
+        taxon_id: str
         method: str
         
 
