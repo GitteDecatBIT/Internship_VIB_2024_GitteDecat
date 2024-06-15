@@ -362,19 +362,6 @@ Showing ontology structure based on https://github.com/biolink/biolink-model/raw
 The ontology contains multiple inheritance (one child node has multiple parent nodes). This is not visualized in the following hierarchy tree (the child node is only added once). If you want to browse all relationships of the parsed ontology write a graphml file to disk and view this file.
 2024-05-08 17:00:08,870	INFO	module:_ontology
 
-entity
-├── association
-│   ├── gene to gene association
-│   │   └── pairwise gene to gene interaction
-│   │       └── pairwise molecular interaction
-│   │           └── protein interaction
-│   └── protein to disease association
-└── named thing
-    └── biological entity
-        ├── disease or phenotypic feature
-        │   └── disease
-        └── polypeptide
-            └── protein
 
 2024-05-08 17:00:08,870	INFO	module:_core
 Duplicate node types encountered (IDs in log): 
