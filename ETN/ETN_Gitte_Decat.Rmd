@@ -732,5 +732,8 @@ The student works fluently with colleagues, helps or asks for help wherever poss
 
 #### Friday 14/06/2024
 ##### Integrated feedback in adapter file\
+When downloading taxon_id 9606 and 559292 it gives an error when writing edges--> was not able to fix this. Supervisor will take a further look to this. 
+
+
 
  
