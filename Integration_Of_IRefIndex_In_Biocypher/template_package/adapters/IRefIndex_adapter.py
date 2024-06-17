@@ -273,8 +273,8 @@ class IRefIndexAdapter:
         for (partners, interaction) in self.interactions.items():
             for node_id in partners:
                 if node_id not in node_ids:
-                    # make a Protein
                     node_ids.add(node_id)
+
                     if node_id == interaction.partner_a:
                         taxon_id = interaction.taxon_a
                     if node_id == interaction.partner_b:
@@ -339,7 +339,7 @@ class IRefIndexAdapter:
             for m in props.get("method", []):
                 assert "|" not in m
 
-            yield (None, _source, _target, label, props)    
+            yield (None, _source, _target, label, props)
         t4 = time()
         logger.info(f"Edges were generated in {round((t4-t3) / 60, 2)} mins")
 
