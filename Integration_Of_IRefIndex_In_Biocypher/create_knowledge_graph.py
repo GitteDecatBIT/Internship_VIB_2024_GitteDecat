@@ -14,6 +14,7 @@ from biocypher._logger import logger
 # Define the taxon_id and the release version
 # if you want to specify a taxon_id that is not in the list below, the file "All" will be downloaded and filtered on taxon_id
 
+
 def get_taxon_id_from_arg():
     """Get taxon_id from command line arguments or prompt the user for input."""
     if len(sys.argv) < 2:
@@ -22,15 +23,18 @@ def get_taxon_id_from_arg():
         taxon_id = sys.argv[1]
     return taxon_id
 
+
 def get_release_version_from_arg():
     """Get release_version from command line arguments or prompt the user for input."""
     if len(sys.argv) < 3:
-        release_version = input("Please enter the release_version (e.g., '20.0' for version 20): ")
+        release_version = input(
+            "Please enter the release_version (e.g., '20.0' for version 20): "
+        )
     else:
         release_version = sys.argv[2]
     return release_version
 
-    
+
 # Set of known taxon IDs
 taxon_ids = {
     "9606",  # homo sapiens
@@ -43,7 +47,7 @@ taxon_ids = {
     "6239",  # Caenorhabditis elegans
 }
 taxon_id = get_taxon_id_from_arg()
-release_version= get_release_version_from_arg()
+release_version = get_release_version_from_arg()
 
 if taxon_id not in taxon_ids:
     logger.info(
@@ -60,14 +64,14 @@ else:
 
 logger.info("This is the link of IRefIndex data that is downloaded:{}".format(url))
 
-    
+
 # Instantiate the BioCypher interface
 bc = BioCypher(
     biocypher_config_path=r"config/biocypher_config.yaml",
     schema_config_path=r"config/schema_config.yaml",
 )
 
-    ############# Specify resource #############
+############# Specify resource #############
 resource = Resource(
     name="IRefIndex",  # Name of the resource
     url_s=url,
@@ -85,11 +89,11 @@ node_fields = [
     IRefIndexNodeFields.PUBMED_IDS,
     IRefIndexNodeFields.TAXON,
     IRefIndexNodeFields.METHODS,
-    ]
+]
 edge_type = IRefIndexEdgeType.PROTEIN_PROTEIN_INTERACTION
 edge_fields = IRefIndexEdgeFields.RELATIONSHIP_ID
 
-    ############# Create an adapter instance #############
+############# Create an adapter instance #############
 adapter = IRefIndexAdapter(
     node_types=node_types,
     node_fields=node_fields,
@@ -97,7 +101,7 @@ adapter = IRefIndexAdapter(
     edge_fields=edge_fields,
 )
 
-adapter.irefindex_process(taxon_id,paths)
+adapter.irefindex_process(taxon_id, paths)
 ############# Create a knowledge graph from the adapter #############
 bc.write_nodes(adapter.get_nodes())
 bc.write_edges(adapter.get_edges())
@@ -105,6 +109,3 @@ bc.write_edges(adapter.get_edges())
 bc.write_import_call()
 ############# Print summary #############
 bc.summary()
-
-
-
