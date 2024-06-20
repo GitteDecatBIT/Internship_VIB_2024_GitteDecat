@@ -75,28 +75,20 @@ class IRefIndexAdapter:
 
     def __init__(
         self,
-        output_dir=None,
         irefindex_fields: Union[
             None, list[IRefIndexNodeFields, IRefIndexEdgeFields]
         ] = None,
         add_prefix=True,
-        aggregate_pubmed_ids: bool = True,
-        aggregate_methods: bool = True,
         nodes_ids=None,
         node_types: Union[None, list[IRefIndexNodeType]] = None,
         node_fields: Union[None, list[IRefIndexNodeFields]] = None,
         edge_types: Union[None, list[IRefIndexEdgeType]] = None,
         edge_fields: Union[None, list[IRefIndexEdgeFields]] = None,
     ):
-        self.output_dir = output_dir
         self.irefindex_fields = irefindex_fields
         self.add_prefix = add_prefix
         self.nodes_ids = nodes_ids
-        self.add_prefix = add_prefix
-        self.aggregate_dict = {
-            IRefIndexNodeFields.PUBMED_IDS.value: aggregate_pubmed_ids,
-            IRefIndexNodeFields.METHODS.value: aggregate_methods,
-        }
+
         self.interactions = {}
 
         self._set_types_and_fields(node_types, node_fields, edge_types, edge_fields)
@@ -230,7 +222,7 @@ class IRefIndexAdapter:
                     self.interactions[(partner_a, partner_b)] = Interaction(
                         partner_a=partner_a,
                         partner_b=partner_b,
-                        pmid={pmid} if pmid.strip() != "" else set(),
+                        pmid={pmid} if pmid != "" else set(),
                         method={method} if method != "" else set(),
                         taxon_a={taxon_a} if taxon_a != "" else set(),
                         taxon_b={taxon_b} if taxon_b != "" else set(),
@@ -238,7 +230,8 @@ class IRefIndexAdapter:
                         relationship_id={relationship_id} if relationship_id != "" else set(),
                     )
                 else:
-                    self.interactions[(partner_a, partner_b)].pmid.add(pmid)
+                    if pmid != "":
+                        self.interactions[(partner_a, partner_b)].pmid.add(pmid)
                     if method != "":
                         self.interactions[(partner_a, partner_b)].method.add(method)
                     if taxon_a != "":
